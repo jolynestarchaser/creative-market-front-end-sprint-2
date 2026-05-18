@@ -9,10 +9,13 @@ import {
 } from "recharts";
 
 const chartData = [
-  { label: "May 12", sales: 2100 },
-  { label: "May 20", sales: 3450 },
-  { label: "May 29", sales: 4920 },
-  { label: "Jun 08", sales: 6240 },
+  { label: "Mon", sales: 980 },
+  { label: "Tue", sales: 1124.5 },
+  { label: "Wed", sales: 1060 },
+  { label: "Thu", sales: 1240 },
+  { label: "Fri", sales: 1340 },
+  { label: "Sat", sales: 1370 },
+  { label: "Sun", sales: 1510 },
 ];
 
 const SalesChart = () => {
@@ -21,15 +24,12 @@ const SalesChart = () => {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold text-gray-900">Sales Overview</h2>
-          <p className="mt-1 text-sm text-gray-400">
-            Revenue performance across all channels
-          </p>
         </div>
         <button
           type="button"
           className="rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600"
         >
-          Last 30 Days
+          Weekly
         </button>
       </div>
 
@@ -40,7 +40,13 @@ const SalesChart = () => {
             margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
           >
             <defs>
-              <linearGradient id="salesAreaGradient" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient
+                id="salesAreaGradient"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
                 <stop offset="0%" stopColor="#6366f1" stopOpacity={0.28} />
                 <stop offset="100%" stopColor="#6366f1" stopOpacity={0.02} />
               </linearGradient>
@@ -65,7 +71,10 @@ const SalesChart = () => {
             <Tooltip
               cursor={{ stroke: "#c7d2fe", strokeWidth: 1 }}
               formatter={(value) => [
-                `THB ${Number(value).toLocaleString()}`,
+                `THB ${Number(value).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`,
                 "Sales",
               ]}
               contentStyle={{

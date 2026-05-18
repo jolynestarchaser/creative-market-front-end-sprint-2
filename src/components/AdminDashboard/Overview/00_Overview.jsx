@@ -3,36 +3,27 @@ import StatsCard from "./01_StatsCard";
 import SalesChart from "./02_SalesChart";
 import ProductBreakdown from "./03_ProductBreakdown";
 import RecentOrders from "./04_RecentOrders";
-import TopSellingArt from "./05_TopSellingArt";
 
 const stats = [
   {
     label: "TOTAL SALES",
-    value: "THB 8,624.50",
-    change: "18.6% from last 30 days",
-    changeDirection: "up",
+    value: "฿ 8,624.50",
   },
   {
     label: "ORDER",
     value: "124",
-    change: "12.3% from last 30 days",
-    changeDirection: "up",
   },
   {
     label: "ITEM SOLD",
     value: "156",
-    change: "4.7% from last 30 days",
-    changeDirection: "up",
   },
   {
     label: "AVERAGE ORDER VALUE",
-    value: "69.55",
-    change: "5.0% from last 30 days",
-    changeDirection: "up",
+    value: "฿ 69.55",
   },
 ];
 
-const Overview = () => {
+const Overview = ({ orders, onUpdateOrders, onOpenOrders }) => {
   return (
     <section className="space-y-4">
       <header className="flex items-center gap-3">
@@ -43,9 +34,7 @@ const Overview = () => {
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
             Overview
           </h1>
-          <p className="text-sm text-gray-500">
-            Store snapshot for the last 30 days
-          </p>
+          <p className="text-sm text-gray-500">เก็บบันทึกสถานะข้อมูลย้อนหลัง</p>
         </div>
       </header>
 
@@ -60,10 +49,11 @@ const Overview = () => {
         <ProductBreakdown />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <RecentOrders />
-        <TopSellingArt />
-      </div>
+      <RecentOrders
+        orders={orders}
+        onUpdateOrders={onUpdateOrders}
+        onOpenOrders={onOpenOrders}
+      />
     </section>
   );
 };

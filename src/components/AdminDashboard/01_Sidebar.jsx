@@ -1,12 +1,21 @@
-import { BarChart3, LayoutDashboard, LogOut, ShoppingCart } from "lucide-react";
+import {
+  BarChart3,
+  LayoutDashboard,
+  PackagePlus,
+  ShoppingCart,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const navItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "orders", label: "Orders", icon: ShoppingCart },
   { id: "sales", label: "Sales", icon: BarChart3 },
+  { id: "artist-drop", label: "Artist Drop", icon: PackagePlus },
 ];
 
 const Sidebar = ({ activePage, onNavigate }) => {
+  const navigate = useNavigate();
+
   return (
     <aside className="flex min-h-screen w-36 shrink-0 flex-col bg-[#1e1b4b] px-3 py-5 md:w-44 md:px-4 md:py-6">
       <div className="mb-2 border-b border-white/10 pb-5">
@@ -25,7 +34,14 @@ const Sidebar = ({ activePage, onNavigate }) => {
             <button
               key={item.id}
               type="button"
-              onClick={() => onNavigate(item.id)}
+              onClick={() => {
+                if (item.id === "artist-drop") {
+                  navigate("/artist-drop");
+                  return;
+                }
+
+                onNavigate(item.id);
+              }}
               className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${
                 isActive
                   ? "bg-white/10 text-white"

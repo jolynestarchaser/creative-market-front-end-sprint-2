@@ -4,9 +4,11 @@ import Sidebar from "../components/AdminDashboard/01_Sidebar";
 import Overview from "../components/AdminDashboard/Overview/00_Overview";
 import Orders from "../components/AdminDashboard/Orders/00_Orders";
 import Sales from "../components/AdminDashboard/Sales/00_Sales";
+import useDashboardOrders from "../hooks/useDashboardOrders";
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState("overview");
+  const [orders, setOrders] = useDashboardOrders();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,12 +20,18 @@ const AdminDashboard = () => {
   const renderPage = () => {
     switch (activePage) {
       case "orders":
-        return <Orders />;
+        return <Orders orders={orders} onUpdateOrders={setOrders} />;
       case "sales":
         return <Sales />;
       case "overview":
       default:
-        return <Overview />;
+        return (
+          <Overview
+            orders={orders}
+            onUpdateOrders={setOrders}
+            onOpenOrders={() => setActivePage("orders")}
+          />
+        );
     }
   };
 

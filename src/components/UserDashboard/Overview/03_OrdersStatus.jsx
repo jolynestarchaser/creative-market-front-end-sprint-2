@@ -1,38 +1,14 @@
-const orders = [
-  {
-    id: "#CM-20191",
-    product: "Golden Bloom Poster",
-    amount: "฿1,250",
-    status: "COMPLETED",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSIEKy6y3lULpkEQmffQKqmPffJnQxl8O2RIg&s",
-  },
-  {
-    id: "#CM-20192",
-    product: "Midnight Echo Canvas",
-    amount: "฿2,900",
-    status: "PROCESSING",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyPQL9QWpX0XxqUElYkger625NwpddEwCC1w&s",
-  },
-  {
-    id: "#CM-20193",
-    product: "Clay Form Vase",
-    amount: "฿980",
-    status: "PENDING",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3RmDkiAyoth-ojPZzs4AP-yD3QmQC-TJAaw&s",
-  },
-];
+import { statusLabels } from "../../../data/dashboardOrders";
 
 const statusClasses = {
   COMPLETED: "bg-emerald-100 text-emerald-600",
-  PROCESSING: "bg-sky-100 text-sky-600",
-  PENDING: "bg-amber-100 text-amber-600",
-  CANCELLED: "bg-rose-100 text-rose-600",
+  PAYABLE: "bg-amber-100 text-amber-600",
+  RECEIVABLE: "bg-sky-100 text-sky-600",
 };
 
-const OrdersStatus = () => {
+const OrdersStatus = ({ orders, onOpenOrders }) => {
+  const recentOrders = orders.slice(0, 3);
+
   return (
     <div>
       <div className="mb-5">
@@ -44,19 +20,20 @@ const OrdersStatus = () => {
 
       <div className="overflow-hidden rounded-2xl bg-white pb-4">
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full table-fixed text-left">
             <thead className="bg-gray-200/50">
               <tr className="border-b border-gray-100 text-xs uppercase tracking-[0.2em] text-gray-500">
-                <th className="py-3 pl-4 font-semibold md:pl-8">Product</th>
-                <th className="py-4 font-semibold">ID</th>
-                <th className="py-4 font-semibold">Status</th>
+                <th className="w-[52%] py-3 pl-4 font-semibold md:pl-8">
+                  Product
+                </th>
+                <th className="w-[24%] py-4 font-semibold">Status</th>
                 <th className="py-4 pr-4 text-right font-semibold md:pr-8">
                   Amount
                 </th>
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {recentOrders.map((order) => (
                 <tr
                   key={order.id}
                   className="border-b border-gray-200 last:border-b-0"
@@ -73,16 +50,15 @@ const OrdersStatus = () => {
                       </span>
                     </div>
                   </td>
-                  <td className="py-4 text-sm text-gray-500">{order.id}</td>
                   <td className="py-4">
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[order.status]}`}
                     >
-                      {order.status}
+                      {statusLabels[order.status]}
                     </span>
                   </td>
                   <td className="py-4 pr-4 text-right text-sm font-semibold text-gray-900 md:pr-8">
-                    {order.amount}
+                    {order.price}
                   </td>
                 </tr>
               ))}
@@ -90,10 +66,11 @@ const OrdersStatus = () => {
           </table>
         </div>
 
-        <div className="flex justify-center border-t-2 border-gray-100 px-4">
+        <div className="flex justify-center border-t border-gray-100 px-4 pt-4 md:px-8">
           <button
             type="button"
-            className="pt-4 text-sm font-semibold text-violet-600 transition hover:text-violet-700"
+            onClick={onOpenOrders}
+            className="text-sm font-semibold text-violet-600 transition hover:text-violet-700"
           >
             View Full Order Status →
           </button>

@@ -1,16 +1,22 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 const items = [
-  { label: "Collection name 1", percent: "25%", value: 25, color: "#6366f1" },
-  { label: "Collection name 2", percent: "20%", value: 20, color: "#8b5cf6" },
-  { label: "Collection name 3", percent: "10%", value: 10, color: "#c4b5fd" },
-  { label: "Collection name 4", percent: "10%", value: 10, color: "#9ca3af" },
+  { label: "Visual Art", sold: "68 ชิ้น", value: 68, color: "#6366f1" },
+  {
+    label: "Craft & Handmade",
+    sold: "52 ชิ้น",
+    value: 52,
+    color: "#8b5cf6",
+  },
+  { label: "Music & Sound", sold: "36 ชิ้น", value: 36, color: "#c4b5fd" },
 ];
 
 const ProductBreakdown = () => {
   return (
     <article className="rounded-2xl bg-white p-5 md:p-6">
-      <h2 className="text-lg font-bold text-gray-900">Product Breakdown</h2>
+      <h2 className="text-lg font-bold text-gray-900">
+        ยอดขายจำแนกตาม Category
+      </h2>
 
       <div className="mt-6 flex justify-center">
         <div className="relative h-44 w-44">
@@ -53,7 +59,7 @@ const ProductBreakdown = () => {
               />
               <span className="text-gray-600">{item.label}</span>
             </div>
-            <span className="font-semibold text-gray-900">{item.percent}</span>
+            <span className="font-semibold text-gray-900">{item.sold}</span>
           </div>
         ))}
       </div>

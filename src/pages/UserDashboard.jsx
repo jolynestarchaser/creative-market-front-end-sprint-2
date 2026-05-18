@@ -4,20 +4,27 @@ import Sidebar from "../components/UserDashboard/01_Sidebar";
 import Overview from "../components/UserDashboard/Overview/00_Overview";
 import MyOrders from "../components/UserDashboard/MyOrders/00_MyOrders";
 import MyAddress from "../components/UserDashboard/MyAddress/00_MyAddress";
+import useDashboardOrders from "../hooks/useDashboardOrders";
 
 const UserDashboard = () => {
   const [activePage, setActivePage] = useState("overview");
+  const [orders] = useDashboardOrders();
   const navigate = useNavigate();
 
   const renderPage = () => {
     switch (activePage) {
       case "my-orders":
-        return <MyOrders />;
+        return <MyOrders orders={orders} />;
       case "my-address":
         return <MyAddress />;
       case "overview":
       default:
-        return <Overview />;
+        return (
+          <Overview
+            orders={orders}
+            onOpenOrders={() => setActivePage("my-orders")}
+          />
+        );
     }
   };
 
