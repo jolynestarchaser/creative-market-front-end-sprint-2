@@ -32,10 +32,19 @@ const Market = () => {
     (p) => p._id === "6a1685fc96d193295d2a496a",
   );
   const droppedProduct = products.find(
-    (p) => p._id === "6a1686ee96d193295d2a496b",
+    (p) => p._id === "6a17c381d7b9296b299277da",
   );
-  const newArtistProduct =
-    products.find((p) => p._id === "6a1687df96d193295d2a496c") || products[2];
+  const newArtistProduct = products.find(
+    (p) => p._id === "6a17d6fa366cc8cf0470d4d9",
+  );
+  const trendingProduct = products.find(
+    (p) => p._id === "6a17c675e44f15d5e0a44c43",
+  );
+
+  const getImageUrl = (path) => {
+    if (!path) return "";
+    return path.startsWith("http") ? path : `${imageBaseUrl}${path}`;
+  };
 
   if (loading)
     return <div className="text-white text-center py-20">Loading...</div>;
@@ -55,11 +64,7 @@ const Market = () => {
                     LIMITED
                   </div>
                   <img
-                    src={
-                      limitedProduct.images?.[0]
-                        ? `${imageBaseUrl}${limitedProduct.images[0]}`
-                        : ""
-                    }
+                    src={getImageUrl(limitedProduct.images?.[0])}
                     alt={limitedProduct.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
@@ -97,7 +102,7 @@ const Market = () => {
 
         {/* ==================== Row 2 ==================== */}
         <div className="flex flex-col md:flex-row gap-6 w-full mt-6">
-          {/* Card 1: Just Dropped (ส.เสือ) */}
+          {/* Card 1: Just Dropped  */}
           <div className="md:flex-3 group cursor-pointer relative overflow-hidden rounded-3xl bg-[#1a1a1a] aspect-square shadow-xl">
             {droppedProduct ? (
               <Link to={`/product/${droppedProduct.slug}`}>
@@ -105,11 +110,7 @@ const Market = () => {
                   Just Dropped
                 </div>
                 <img
-                  src={
-                    droppedProduct.images?.[0]
-                      ? `${imageBaseUrl}${droppedProduct.images[0]}`
-                      : ""
-                  }
+                  src={getImageUrl(droppedProduct.images?.[0])}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   alt={droppedProduct.name}
                 />
@@ -138,11 +139,7 @@ const Market = () => {
                   New Artist
                 </div>
                 <img
-                  src={
-                    newArtistProduct.images?.[0]
-                      ? `${imageBaseUrl}${newArtistProduct.images[0]}`
-                      : ""
-                  }
+                  src={getImageUrl(newArtistProduct.images?.[0])}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   alt={newArtistProduct.name}
                 />
@@ -165,21 +162,21 @@ const Market = () => {
 
           {/* Card 3: Trending (รูปจานใบเดิมคงไว้ ไม่ต้องดึงจาก DB จ้ะ) */}
           <div className="md:flex-4 group cursor-pointer relative overflow-hidden rounded-3xl bg-[#1a1a1a] aspect-square shadow-xl">
-            <Link to="/market">
+            <Link to={`/product/${trendingProduct.slug}`}>
               <div className="absolute top-0 left-0 bg-black text-white text-xl font-bold px-3 py-1.5 z-20 tracking-widest uppercase">
                 Trending
               </div>
               <img
-                src={marketCard3}
+                src={getImageUrl(trendingProduct.images?.[0])}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 alt="Trending Ceramic"
               />
               <div className="absolute bottom-0 left-0 w-full bg-white/80 backdrop-blur-md p-5 flex flex-col border-t border-gray-100">
                 <h4 className="text-xl font-bold text-gray-900 leading-tight">
-                  NAME PRODUCT
+                  {trendingProduct.name}
                 </h4>
                 <p className="text-xs text-gray-600 mt-1">
-                  by <span className="font-bold">Name Artist</span>
+                  by <span className="font-bold">{trendingProduct.artist}</span>
                 </p>
               </div>
             </Link>
