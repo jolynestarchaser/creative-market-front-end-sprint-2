@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import marketCard3 from "../../assets/images/market-card-3.png";
 
 const Market = () => {
   const [products, setProducts] = useState([]);
@@ -64,7 +63,7 @@ const Market = () => {
                     LIMITED
                   </div>
                   <img
-                    src={getImageUrl(limitedProduct.images?.[0])}
+                    src={getImageUrl(limitedProduct?.images?.[0])}
                     alt={limitedProduct.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
@@ -110,7 +109,7 @@ const Market = () => {
                   Just Dropped
                 </div>
                 <img
-                  src={getImageUrl(droppedProduct.images?.[0])}
+                  src={getImageUrl(droppedProduct?.images?.[0])}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   alt={droppedProduct.name}
                 />
@@ -139,7 +138,7 @@ const Market = () => {
                   New Artist
                 </div>
                 <img
-                  src={getImageUrl(newArtistProduct.images?.[0])}
+                  src={getImageUrl(newArtistProduct?.images?.[0])}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   alt={newArtistProduct.name}
                 />
@@ -167,7 +166,7 @@ const Market = () => {
                 Trending
               </div>
               <img
-                src={getImageUrl(trendingProduct.images?.[0])}
+                src={getImageUrl(trendingProduct?.images?.[0])}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 alt="Trending Ceramic"
               />
