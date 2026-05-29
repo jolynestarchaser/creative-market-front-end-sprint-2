@@ -46,20 +46,13 @@ const Product = () => {
 
   const handleAddToCart = async () => {
     try {
-      const userId = localStorage.getItem("userId");
-
-      if (!userId) {
-        alert("คุณยังไม่ได้ล็อกอิน กรุณาล็อกอินหรือสมัครสมาชิกก่อน");
-        return;
-      }
-
       const response = await fetch("http://localhost:7777/api/cart/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
-          userId,
           productId: product._id,
           quantity: 1,
         }),
@@ -72,14 +65,19 @@ const Product = () => {
       }
 
       alert("เพิ่มสินค้าลงตะกร้าเรียบร้อยแล้ว");
+      return true;
     } catch (error) {
       alert(error.message);
+      return false;
     }
   };
 
   const handleBuyNow = async () => {
-    await handleAddToCart();
-    navigate("/cart");
+    const added = await handleAddToCart();
+
+    if (added) {
+      navigate("/cart");
+    }
   };
 
   if (loading) {
