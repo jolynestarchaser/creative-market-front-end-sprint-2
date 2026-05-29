@@ -15,6 +15,8 @@ import Register from "./pages/Register";
 import LoginPage from "./pages/LoginPage";
 import ArtistDrop from "./pages/ArtistDrop";
 import ArtistRegisterForm from "./pages/ArtistRegister";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 // สร้าง Router Map
 const router = createBrowserRouter([
@@ -79,6 +81,14 @@ const router = createBrowserRouter([
       {
         path: "/admin-dashboard",
         element: <AdminDashboard />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "/reset-password",
+        element: <ResetPassword />,
       },
     ],
   },

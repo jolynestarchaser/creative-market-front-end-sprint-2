@@ -16,7 +16,7 @@ function MarketHeader({
         <div className="relative w-full md:w-1/3">
           <input
             type="text"
-            placeholder="Search product"
+            placeholder="ค้นหาสินค้า..."
             className="w-full border-2 border-[#373373] rounded-md py-2 px-4 pr-10 bg-[#F8F7FF] text-[#373373] placeholder-[#373373] focus:outline-none"
             onChange={(e) => setSearchQuery(e.target.value)}
           />

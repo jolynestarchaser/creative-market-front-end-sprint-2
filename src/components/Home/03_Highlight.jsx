@@ -5,7 +5,7 @@ import shibaImg from "../../assets/images/highlight-shiba.png";
 
 const Highlight = () => {
   return (
-    <section className="bg-white w-full">
+    <section className="hidden md:block bg-white w-full">
       <div className="max-w-7xl mx-auto w-auto px-7 grid grid-cols-1 py-6 md:grid-cols-2 gap-8  ">
         {/* ================= LEFT ================= */}
 
@@ -43,10 +43,10 @@ const Highlight = () => {
           </div>
 
           {/* 4. Button */}
-          <button className="bg-black text-white px-8 py-5 rounde rounded-xl font-bold flex items-center justify-center gap-3 w-full hover:bg-gray-800 transition-all text-base tracking-widest cursor-pointer">
+          {/* <button className="bg-black text-white px-8 py-5 rounde rounded-xl font-bold flex items-center justify-center gap-3 w-full hover:bg-gray-800 transition-all text-base tracking-widest cursor-pointer">
             <span className="text-xl">VIEW ARTIST</span>
             <span className="text-xl leading-none">↗</span>
-          </button>
+          </button> */}
         </div>
 
         {/* ================= RIGHT ================= */}

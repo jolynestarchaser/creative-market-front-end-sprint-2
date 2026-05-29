@@ -1,8 +1,8 @@
 import React from "react";
 
+import { FaGithub } from "react-icons/fa";
+
 import logo from "../../assets/logos/logo.svg";
-import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
 
 const Footer = () => {
   return (
@@ -34,37 +34,26 @@ const Footer = () => {
             © 2026 Creative Market. All rights reserved.
           </p>
         </div>
+        {/* ================= 3. RIGHT: GITHUB ================= */}
+        <div className="w-full md:w-auto flex flex-col items-center md:items-end gap-3 mt-2 md:mt-0">
+          {/* 1. เปลี่ยนหัวข้อข้อความให้น่าดึงดูด */}
+          <h4 className="text-lg font-bold tracking-wider uppercase text-gray-400">
+            Open Source
+          </h4>
 
-        {/* ================= 3. RIGHT: SOCIALS ================= */}
-        <div className="w-full md:w-auto flex flex-col items-center md:items-end gap-4">
-          <h4 className="text-xl font-bold tracking-tight">Follow us</h4>
-          <div className="flex gap-4">
-            {/* Social Icons */}
-            <a
-              href="#"
-              className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center hover:bg-white hover:text-black transition-all"
-            >
-              <FaFacebookF size={14} />
-            </a>
-            <a
-              href="#"
-              className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center hover:bg-white hover:text-black transition-all"
-            >
-              <FaInstagram size={14} />
-            </a>
-            <a
-              href="#"
-              className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center hover:bg-white hover:text-black transition-all"
-            >
-              <FaTiktok size={14} />
-            </a>
-            <a
-              href="#"
-              className="w-8 h-8 rounded-full border border-gray-600 flex items-center justify-center hover:bg-white hover:text-black transition-all"
-            >
-              <FaXTwitter size={14} />
-            </a>
-          </div>
+          {/* 2. ปุ่มลิงก์ GitHub เดี่ยวแบบโมเดิร์น */}
+          <a
+            href="https://github.com/AshaJenvasu/creative-market-front-end" // อย่าลืมให้เพื่อนหรือตัวเธอเองมาใส่ลิงก์จริงตรงนี้น้า
+            target="_blank" // เปิดแท็บใหม่เวลาคนกด จะได้ไม่ปลิวหลุดจากหน้าเว็บเราจ้า
+            rel="noopener noreferrer" // Security Best Practice ป้องกันช่องโหว่เมื่อใช้ target="_blank"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-700 bg-zinc-900/50 hover:bg-white hover:text-black hover:border-white text-gray-300 transition-all duration-300 text-sm md:text-base font-medium cursor-pointer group"
+          >
+            <FaGithub
+              size={20}
+              className="transition-transform group-hover:scale-110"
+            />
+            <span>GitHub</span>
+          </a>
         </div>
       </div>
     </footer>

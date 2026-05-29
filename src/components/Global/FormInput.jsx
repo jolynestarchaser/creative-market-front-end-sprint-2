@@ -1,6 +1,6 @@
-// สร้าง Component ย่อยรับ Props ต่างๆ เพื่อนำไปเรนเดอร์
 const FormInput = ({
   label,
+  description, // 1. เพิ่ม Prop สำหรับรับข้อความอธิบาย
   name,
   value,
   onChange,
@@ -9,10 +9,11 @@ const FormInput = ({
   type = "text",
   inputMode,
   required,
-  wrapperClass = "", // สำหรับกำหนดขนาดกล่อง (เช่น md:col-span-2)
-  inputWidthClass = "w-full", // สำหรับกำหนดความกว้างช่อง input (เช่น lg:w-2/3)
+  isTextArea = false, // 2. เพิ่ม Prop เพื่อเช็คว่าอยากให้เรนเดอร์เป็น Textarea ไหม
+  rows = 4, // ควบคุมจำนวนบรรทัดเริ่มต้นของ Textarea
+  wrapperClass = "",
+  inputWidthClass = "w-full",
 }) => {
-  // Logic การเปลี่ยนสีกรอบอยู่ที่นี่ที่เดียว
   const baseClass =
     "p-3 outline-none focus:ring-1 placeholder-gray-400 text-gray-800 transition-colors duration-200";
   const inputClass = error
@@ -21,21 +22,40 @@ const FormInput = ({
 
   return (
     <div className={wrapperClass}>
-      {/* ถ้ามี Label ถึงจะเรนเดอร์ */}
+      {/* ส่วน Label */}
       {label && (
-        <label className="block text-base font-bold text-black mb-2">
+        <label className="block text-base font-bold text-black mb-1">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      <input
-        type={type}
-        inputMode={inputMode}
-        name={name}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className={inputClass}
-      />
+
+      {/* ส่วน Description (เรนเดอร์เฉพาะตอนที่มีการส่งค่าเข้ามา) */}
+      {description && (
+        <span className="block text-sm text-gray-500 mb-3">{description}</span>
+      )}
+
+      {/* เช็คว่าเป็น Textarea หรือ Input ธรรมดา */}
+      {isTextArea ? (
+        <textarea
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          rows={rows}
+          className={`${inputClass} resize-y`}
+        />
+      ) : (
+        <input
+          type={type}
+          inputMode={inputMode}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className={inputClass}
+        />
+      )}
+
       {/* แสดง Error ถ้ามี */}
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
