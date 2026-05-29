@@ -6,8 +6,8 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null); // เก็บข้อมูลโปรไฟล์ผู้ใช้ (เช่นชื่อ, รูปภาพ)
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // สถานะล็อกอิน
-  const [userRole, setUserRole] = useState("admin"); // บทบาท: "visitor", "user", "admin"
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // สถานะล็อกอิน
+  const [userRole, setUserRole] = useState("visitor"); // บทบาท: "visitor", "user", "admin"
   const [cartCount, setCartCount] = useState(3); // จำนวนสินค้าในตะกร้า
 
   const serverBaseUrl =
