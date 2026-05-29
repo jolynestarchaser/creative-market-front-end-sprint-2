@@ -243,9 +243,54 @@ const Navbar = () => {
 
       {/* 5. Mobile Dropdown Menu */}
       {isOpen && (
-        <div className="w-full md:hidden flex flex-col mt-4 border-t border-gray-800 pt-4 pb-2 animate-fade-in relative z-40">
+        <div className="w-full md:hidden flex flex-col mt-4 border-t border-gray-800 pt-4 pb-4 animate-fade-in relative z-40 bg-black">
+          {/* 🌟 [เพิ่มเข้าหลัก]: ลิงก์พื้นฐานและหมวดหมู่โชว์ให้ทุกคนเห็น ไม่ว่าจะล็อกอินหรือไม่ก็ตาม จ้า */}
+          <div className="flex flex-col gap-4 px-2 text-lg font-medium border-b border-gray-800 pb-4">
+            <Link
+              to="/"
+              onClick={() => setIsOpen(false)}
+              className="hover:text-gray-400 py-1"
+            >
+              Home
+            </Link>
+            <Link
+              to="/#about-section"
+              onClick={() => setIsOpen(false)}
+              className="hover:text-gray-400 py-1"
+            >
+              About
+            </Link>
+
+            <div className="text-sm text-gray-500 tracking-widest font-bold uppercase mt-2">
+              Categories
+            </div>
+            <Link
+              to="/market?category=Visual Art"
+              onClick={() => setIsOpen(false)}
+              className="text-base pl-2 text-gray-300 hover:text-white py-1"
+            >
+              · Visual Art
+            </Link>
+            <Link
+              to={`/market?category=${encodeURIComponent("Craft & Handmade")}`}
+              onClick={() => setIsOpen(false)}
+              className="text-base pl-2 text-gray-300 hover:text-white py-1"
+            >
+              · Craft & Handmade
+            </Link>
+            <Link
+              to={`/market?category=${encodeURIComponent("Music & Sound")}`}
+              onClick={() => setIsOpen(false)}
+              className="text-base pl-2 text-gray-300 hover:text-white py-1"
+            >
+              · Music & Sound
+            </Link>
+          </div>
+
+          {/* 🌟 ส่วนควบคุมปุ่มตามสถานะล็อกอินจริง (ย้ายลงมาดักต่อท้ายด้านล่าง) */}
           {!isLoggedIn ? (
-            <div className="flex gap-4 mt-8 px-2">
+            // ---------- เคสมือถือ: ยังไม่ได้ล็อกอิน โชว์ปุ่ม Login / Register ----------
+            <div className="flex gap-4 mt-6 px-2">
               <Link
                 to="/login"
                 className="w-full"
@@ -266,8 +311,9 @@ const Navbar = () => {
               </Link>
             </div>
           ) : (
-            <div className="flex flex-col gap-3 mt-6 border-t border-gray-800 pt-4 px-2">
-              <div className="flex flex-col gap-1 mb-2">
+            // ---------- เคสมือถือ: ล็อกอินแล้ว โชว์ Action ของบัญชี ----------
+            <div className="flex flex-col gap-3 mt-4 px-2">
+              <div className="flex flex-col gap-1 mt-2">
                 <div className="text-sm text-gray-500 tracking-widest font-bold uppercase">
                   Account Actions
                 </div>
@@ -284,7 +330,7 @@ const Navbar = () => {
                 <Link
                   to="/cart"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-between text-white hover:text-purple-400 py-2 transition-colors"
+                  className="flex items-center justify-between text-white hover:text-purple-400 py-2 transition-colors border-t border-gray-900 mt-1"
                 >
                   <span className="flex items-center gap-3 text-lg font-medium">
                     <svg
