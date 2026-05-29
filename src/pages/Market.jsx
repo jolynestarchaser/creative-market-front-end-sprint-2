@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router-dom";
 import ProductCard from "../components/Market/ProductCard";
 import MarketHeader from "../components/Market/MarketHeader";
+import { useAuth } from "../context/AuthContext";
 
 const Market = () => {
-  const [cartCount, setCartCount] = useState(0);
+  // 🌟 2. ดึงค่าสถานะสิทธิ์ที่แอบถอดรหัสจากคุกกี้จริงหลังบ้านมาใช้งานแทนค่าทดสอบเดิมจ้า
+  const { isLoggedIn, userRole } = useAuth();
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFilterActive, setIsFilterActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const [isLoggedIn, setIsLoggedIn] = useState(true); //only for testing
-  const [userRole, setUserRole] = useState("user"); //only for testing
 
   const activeCategory = searchParams.get("category") || "All";
   const categories = ["All", "Visual Art", "Craft & Handmade", "Music & Sound"];
@@ -36,10 +36,6 @@ const Market = () => {
 
   const handleCategoryChange = (newCategory) => {
     setSearchParams({ category: newCategory });
-  };
-
-  const handleAddToCart = () => {
-    setCartCount((prevCount) => prevCount + 1);
   };
 
   // ── Filter (ทำงานกับข้อมูลจริง) ──
@@ -94,9 +90,8 @@ const Market = () => {
               <Link key={product._id} to={`/product/${product.slug}`}>
                 <ProductCard
                   product={product}
-                  isLoggedIn={isLoggedIn} //only for testing
-                  userRole={userRole} //only for testing
-                  onAddToCartSuccess={handleAddToCart}
+                  isLoggedIn={isLoggedIn} // 🌟 3. ส่งสัญญาณล็อกอินจริงเข้าการ์ดสินค้า
+                  userRole={userRole} // 🌟 4. ส่งยศจริงเข้าการ์ดสินค้า
                 />
               </Link>
             ))

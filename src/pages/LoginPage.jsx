@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 // --- Import รูปภาพ ---
 import bgDesktop from "../assets/images/j-login-bg.jpg";
@@ -8,6 +9,7 @@ import logoLogin from "../assets/icons/creative-logo.svg";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { setIsLoggedIn, setUserRole } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -41,23 +43,28 @@ const LoginPage = () => {
 
     try {
       // ใช้ URL เต็มๆ ยิงตรงไปที่ Backend เลย (ไม่ต้องผ่าน Proxy)
-      const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+      const apiBaseUrl =
+        import.meta.env.VITE_API_URL || "http://localhost:7777";
       const apiUrl = `${apiBaseUrl}/api/auth/login`;
 
       const response = await fetch(apiUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-        // สำคัญมาก: ต้องมี credentials: 'include' เพื่อรับ Cookie 
-        credentials: 'include', 
+        // สำคัญมาก: ต้องมี credentials: 'include' เพื่อรับ Cookie
+        credentials: "include",
       });
 
       const data = await response.json();
 
       if (response.ok) {
         setErrors({});
+
+        setIsLoggedIn(true);
+        setUserRole(data.role);
+
         setIsSuccess(true);
       } else {
         setErrors({ password: data.message || "Invalid email or password!!" });
@@ -93,7 +100,9 @@ const LoginPage = () => {
             Enter your email
           </label>
 
-          <div className={`relative transition-all duration-300 ${errors.email ? "pb-5" : "pb-0"}`}>
+          <div
+            className={`relative transition-all duration-300 ${errors.email ? "pb-5" : "pb-0"}`}
+          >
             <input
               type="email"
               placeholder="Enter your email address"
@@ -111,7 +120,9 @@ const LoginPage = () => {
             )}
           </div>
 
-          <div className={`relative transition-all duration-300 ${errors.password ? "pb-5" : "pb-0"}`}>
+          <div
+            className={`relative transition-all duration-300 ${errors.password ? "pb-5" : "pb-0"}`}
+          >
             <input
               type="password"
               placeholder="Enter your password"
