@@ -6,10 +6,11 @@ const Market = () => {
   const [loading, setLoading] = useState(true);
 
   // ดึงค่า URL จาก Vite Env
-  const serverBaseUrl =
-    import.meta.env.VITE_SERVER_URL || "http://localhost:7777";
+  const serverBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
   const apiBaseUrl = `${serverBaseUrl}/api`;
-  const imageBaseUrl = serverBaseUrl;
+  const getImg = (images) =>
+    images?.[0] ??
+    "https://res.cloudinary.com/duc5gow6f/image/upload/v1779948614/frieren-01_jbkbxq.png";
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -40,11 +41,6 @@ const Market = () => {
   const trendingProduct = products.find(
     (p) => p._id === "6a17c675e44f15d5e0a44c43",
   );
-
-  const getImageUrl = (path) => {
-    if (!path) return "";
-    return path.startsWith("http") ? path : `${imageBaseUrl}${path}`;
-  };
 
   if (loading)
     return (
@@ -87,7 +83,7 @@ const Market = () => {
                     LIMITED
                   </div>
                   <img
-                    src={getImageUrl(limitedProduct?.images?.[0])}
+                    src={getImg(limitedProduct?.images)}
                     alt={limitedProduct?.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
@@ -133,7 +129,7 @@ const Market = () => {
                   Just Dropped
                 </div>
                 <img
-                  src={getImageUrl(droppedProduct?.images?.[0])}
+                  src={getImg(droppedProduct?.images)}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   alt={droppedProduct?.name}
                 />
@@ -162,7 +158,7 @@ const Market = () => {
                   New Artist
                 </div>
                 <img
-                  src={getImageUrl(newArtistProduct?.images?.[0])}
+                  src={getImg(newArtistProduct?.images)}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   alt={newArtistProduct?.name}
                 />
@@ -192,7 +188,7 @@ const Market = () => {
                 Trending
               </div>
               <img
-                src={getImageUrl(trendingProduct?.images?.[0])}
+                src={getImg(trendingProduct?.images)}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 alt="Trending Ceramic"
               />
