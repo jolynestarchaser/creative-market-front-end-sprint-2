@@ -6,7 +6,7 @@ import ProductPurchasePanel from "../components/Product/05_ProductPurchasePanel"
 import ProductShowcase from "../components/Product/06_ProductShowcase";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { productSamples } from "../data/productSamples";
+// import { productSamples } from "../data/productSamples"; ไม่ใช้ข้อมูลจาก mock data แล้ว
 
 const Product = () => {
   const navigate = useNavigate();
@@ -15,9 +15,6 @@ const Product = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // ตอนนี้ยังเก็บไว้ก่อน เพราะ ProductHeaderBar ยังใช้ products สำหรับ search mock อยู่
-  const products = Object.values(productSamples);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -78,7 +75,7 @@ const Product = () => {
 
   return (
     <main className="min-h-screen w-full bg-[#eeecfb]">
-      <ProductHeaderBar category={product.category} products={products} />
+      <ProductHeaderBar category={product.category} />
 
       <section className="mx-auto flex max-w-7xl flex-col gap-6 px-4 pb-10 sm:px-6 md:gap-8 md:px-8 md:pb-12">
         <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-[1.02fr_1fr] lg:items-start">
