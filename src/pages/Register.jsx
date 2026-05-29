@@ -84,11 +84,11 @@ const Register = () => {
     }
 
     // ดึง URL จาก Environment Variables
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:7777/api';
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:7777';
 
     try {
       // 1. ตรวจสอบอีเมลซ้ำกับ Backend
-      const emailCheckRes = await fetch(`${API_URL}/users/check-email?email=${formData.email}`);
+      const emailCheckRes = await fetch(`${API_URL}/api/users/check-email?email=${formData.email}`);
       const emailCheck = await emailCheckRes.json();
       
       if (emailCheck.exists) {
@@ -97,7 +97,7 @@ const Register = () => {
       }
 
       // 2. ส่งข้อมูลสมัครสมาชิกไปที่ Backend
-      const registerRes = await fetch(`${API_URL}/users/register`, {
+      const registerRes = await fetch(`${API_URL}/api/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -41,8 +41,8 @@ const LoginPage = () => {
 
     try {
       // ใช้ URL เต็มๆ ยิงตรงไปที่ Backend เลย (ไม่ต้องผ่าน Proxy)
-      const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777/api";
-      const apiUrl = `${apiBaseUrl}/auth/login`;
+      const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+      const apiUrl = `${apiBaseUrl}/api/auth/login`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
