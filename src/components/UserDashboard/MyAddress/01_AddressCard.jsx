@@ -1,7 +1,6 @@
 import { LucideHome, LucidePencil, LucideTrash2 } from "lucide-react";
 
 const AddressCard = ({ address, onEdit, onDelete }) => {
-  // เพิ่ม onEdit, onDelete
   return (
     <article className="flex flex-col gap-5 rounded-4xl border border-violet-200 bg-white p-5 md:flex-row md:items-center md:gap-6 md:rounded-[40px] md:p-8">
       <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-[#f0effb] text-violet-700 md:h-24 md:w-24">
@@ -24,7 +23,6 @@ const AddressCard = ({ address, onEdit, onDelete }) => {
           </p>
         </div>
 
-        {/* ลบ hardcode text ออก เปลี่ยนเป็น dynamic */}
         <div className="max-w-full space-y-0.5 text-base text-gray-500 md:max-w-xs md:text-lg">
           <p>{address.street}</p>
           <p>{address.city}</p>
@@ -33,13 +31,13 @@ const AddressCard = ({ address, onEdit, onDelete }) => {
 
         <div className="flex flex-wrap gap-4 md:flex-col">
           <button
-            onClick={onEdit} // เพิ่ม onClick
+            onClick={onEdit}
             className="flex items-center gap-3 text-base font-medium text-violet-600 transition hover:opacity-80 md:text-lg"
           >
             <LucidePencil size={20} /> Edit
           </button>
           <button
-            onClick={onDelete} // เพิ่ม onClick
+            onClick={onDelete}
             className="flex items-center gap-3 text-base font-medium text-violet-600 transition hover:opacity-80 md:text-lg"
           >
             <LucideTrash2 size={20} /> Delete

@@ -1,45 +1,53 @@
 const statusClasses = {
-  COMPLETED: "bg-emerald-100 text-emerald-600",
-  PAYABLE: "bg-amber-100 text-amber-600",
-  RECEIVABLE: "bg-sky-100 text-sky-600",
+  paid: "bg-emerald-100 text-emerald-600",
+  pending: "bg-amber-100 text-amber-600",
+  cancelled: "bg-rose-100 text-rose-600",
 };
 
-const OrderCard = ({ order, statusLabel }) => {
-  const courier = order.courier || "-";
-  const trackingNumber = order.trackingNumber || "-";
-  const courierClassName = order.courier
-    ? "mt-1 font-semibold text-gray-900"
-    : "mt-1 font-semibold text-gray-300";
-  const trackingClassName = order.trackingNumber
-    ? "mt-1 font-semibold text-gray-900"
-    : "mt-1 font-semibold text-gray-300";
+const formatDate = (value) =>
+  new Date(value).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 
+const OrderCard = ({ order }) => {
   return (
     <article className="flex flex-col gap-5 rounded-2xl bg-white p-5 md:flex-row md:items-center md:gap-6 md:p-6">
-      <img
-        src={order.image}
-        alt={order.product}
-        className="h-20 w-20 shrink-0 rounded-2xl object-cover shadow-sm md:h-24 md:w-24"
-      />
-
-      <div className="min-w-0 flex-1">
-        <h3 className="text-lg font-bold text-gray-900">{order.product}</h3>
-        <p className="mt-1 text-sm text-gray-500">by {order.artist}</p>
-        <p className="mt-3 text-sm text-gray-400">{order.items} items</p>
+      <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-2xl font-bold text-gray-500 shadow-sm md:h-24 md:w-24">
+        {order.name.charAt(0).toUpperCase()}
       </div>
 
-      <div className="grid shrink-0 gap-4 text-sm text-gray-500 md:min-w-[360px] md:grid-cols-3">
+      <div className="min-w-0 flex-1">
+        <h3 className="text-lg font-bold text-gray-900">{order.name}</h3>
+        <p className="mt-1 text-sm text-gray-500">Order #{order.orderId}</p>
+        <p className="mt-3 text-sm text-gray-400">{order.quantity} item(s)</p>
+      </div>
+
+      <div className="grid shrink-0 gap-4 text-sm text-gray-500 md:min-w-[420px] md:grid-cols-4">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
             Date
           </p>
-          <p className="mt-1 font-semibold text-gray-900">{order.date}</p>
+          <p className="mt-1 font-semibold text-gray-900">
+            {formatDate(order.createdAt)}
+          </p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
             Price
           </p>
-          <p className="mt-1 font-semibold text-gray-900">{order.price}</p>
+          <p className="mt-1 font-semibold text-gray-900">
+            ฿{order.price.toLocaleString("en-US")}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
+            Amount
+          </p>
+          <p className="mt-1 font-semibold text-gray-900">
+            ฿{order.lineTotal.toLocaleString("en-US")}
+          </p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
@@ -48,23 +56,8 @@ const OrderCard = ({ order, statusLabel }) => {
           <span
             className={`mt-1 inline-flex rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[order.status]}`}
           >
-            {statusLabel}
+            {order.statusLabel}
           </span>
-        </div>
-      </div>
-
-      <div className="grid shrink-0 gap-3 text-sm text-gray-500 md:min-w-[260px]">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
-            Courier
-          </p>
-          <p className={courierClassName}>{courier}</p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-gray-400">
-            Tracking Number
-          </p>
-          <p className={trackingClassName}>{trackingNumber}</p>
         </div>
       </div>
     </article>

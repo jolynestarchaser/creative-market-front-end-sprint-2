@@ -2,8 +2,8 @@ import { useState } from "react";
 import AddressCard from "./01_AddressCard";
 
 const MyAddress = () => {
-  const [address, setAddress] = useState(null); // null = ยังไม่มีที่อยู่
-  const [mode, setMode] = useState("empty"); // "empty" | "form" | "view"
+  const [address, setAddress] = useState(null);
+  const [mode, setMode] = useState("empty");
   const [form, setForm] = useState({
     label: "",
     name: "",
@@ -61,7 +61,6 @@ const MyAddress = () => {
 
       <h2 className="text-lg font-bold text-gray-900">ที่อยู่จัดส่ง</h2>
 
-      {/* Empty State */}
       {mode === "empty" && (
         <div className="flex flex-col items-center gap-4 rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50 p-10">
           <p className="text-gray-400">ยังไม่มีข้อมูลที่อยู่</p>
@@ -74,9 +73,8 @@ const MyAddress = () => {
         </div>
       )}
 
-      {/* Form */}
       {mode === "form" && (
-        <div className="rounded-2xl border border-violet-200 bg-white p-6 space-y-4">
+        <div className="space-y-4 rounded-2xl border border-violet-200 bg-white p-6">
           <p className="font-medium text-gray-800">
             {address ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่ใหม่"}
           </p>
@@ -107,7 +105,11 @@ const MyAddress = () => {
                 name: "city",
                 placeholder: "กรุงเทพมหานคร",
               },
-              { label: "รหัสไปรษณีย์", name: "postcode", placeholder: "10110" },
+              {
+                label: "รหัสไปรษณีย์",
+                name: "postcode",
+                placeholder: "10110",
+              },
             ].map((field) => (
               <div key={field.name} className="flex flex-col gap-1">
                 <label className="text-xs text-gray-500">{field.label}</label>
@@ -116,7 +118,7 @@ const MyAddress = () => {
                   value={form[field.name]}
                   onChange={handleChange}
                   placeholder={field.placeholder}
-                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-violet-400"
+                  className="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-violet-400 focus:outline-none"
                 />
               </div>
             ))}
@@ -138,7 +140,6 @@ const MyAddress = () => {
         </div>
       )}
 
-      {/* View */}
       {mode === "view" && address && (
         <AddressCard
           address={address}
