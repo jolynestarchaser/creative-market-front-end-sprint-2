@@ -32,9 +32,17 @@ const OrdersHistory = ({ orders, onOpenOrders }) => {
                   >
                     <td className="py-4 pl-4 md:pl-8">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-100 text-sm font-semibold text-gray-500">
-                          {order.name.charAt(0).toUpperCase()}
-                        </div>
+                        {order.image ? (
+                          <img
+                            src={order.image}
+                            alt={order.name}
+                            className="h-12 w-12 rounded-2xl object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-100 text-sm font-semibold text-gray-500">
+                            {order.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
                         <div>
                           <span className="text-sm font-medium text-gray-800">
                             {order.name}

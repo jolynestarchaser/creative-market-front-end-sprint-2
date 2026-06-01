@@ -14,13 +14,23 @@ const formatDate = (value) =>
 const OrderCard = ({ order }) => {
   return (
     <article className="flex flex-col gap-5 rounded-2xl bg-white p-5 md:flex-row md:items-center md:gap-6 md:p-6">
-      <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-2xl font-bold text-gray-500 shadow-sm md:h-24 md:w-24">
-        {order.name.charAt(0).toUpperCase()}
-      </div>
+      {order.image ? (
+        <img
+          src={order.image}
+          alt={order.name}
+          className="h-20 w-20 shrink-0 rounded-2xl bg-gray-100 object-cover shadow-sm md:h-24 md:w-24"
+        />
+      ) : (
+        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-2xl font-bold text-gray-500 shadow-sm md:h-24 md:w-24">
+          {order.name.charAt(0).toUpperCase()}
+        </div>
+      )}
 
       <div className="min-w-0 flex-1">
         <h3 className="text-lg font-bold text-gray-900">{order.name}</h3>
-        <p className="mt-1 text-sm text-gray-500">Order #{order.orderId}</p>
+        <p className="mt-1 text-sm text-gray-500">
+          {order.artist !== "-" ? `by ${order.artist}` : `Order #${order.orderId}`}
+        </p>
         <p className="mt-3 text-sm text-gray-400">{order.quantity} item(s)</p>
       </div>
 
