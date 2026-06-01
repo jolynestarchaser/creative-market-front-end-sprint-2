@@ -5,6 +5,7 @@ import Overview from "../components/AdminDashboard/Overview/00_Overview";
 import Orders from "../components/AdminDashboard/Orders/00_Orders";
 import Sales from "../components/AdminDashboard/Sales/00_Sales";
 import useDashboardOrders from "../hooks/useDashboardOrders";
+import ArtistDrop from "./ArtistDrop";
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState("overview");
@@ -23,6 +24,8 @@ const AdminDashboard = () => {
         return <Orders orders={orders} onUpdateOrders={setOrders} />;
       case "sales":
         return <Sales />;
+      case "artist-drop":
+        return <ArtistDrop />;
       case "overview":
       default:
         return (
