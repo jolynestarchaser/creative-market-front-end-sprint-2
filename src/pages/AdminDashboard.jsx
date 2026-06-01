@@ -1,34 +1,40 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import Sidebar from "../components/AdminDashboard/01_Sidebar";
 import Overview from "../components/AdminDashboard/Overview/00_Overview";
 import Orders from "../components/AdminDashboard/Orders/00_Orders";
 import Sales from "../components/AdminDashboard/Sales/00_Sales";
-import useDashboardOrders from "../hooks/useDashboardOrders";
+import useAdminDashboard from "../hooks/useAdminDashboard";
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState("overview");
-  const [orders, setOrders] = useDashboardOrders();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (activePage === "customer") {
-      navigate("/userdashboard");
-    }
-  }, [activePage, navigate]);
+  const { dashboardData, loading, error } = useAdminDashboard();
 
   const renderPage = () => {
     switch (activePage) {
       case "orders":
-        return <Orders orders={orders} onUpdateOrders={setOrders} />;
+        return (
+          <Orders
+            summary={dashboardData.orders.summary}
+            orders={dashboardData.orders.orders}
+            loading={loading}
+            error={error}
+          />
+        );
       case "sales":
-        return <Sales />;
+        return (
+          <Sales
+            stats={dashboardData.sales}
+            loading={loading}
+            error={error}
+          />
+        );
       case "overview":
       default:
         return (
           <Overview
-            orders={orders}
-            onUpdateOrders={setOrders}
+            stats={dashboardData.overview}
+            loading={loading}
+            error={error}
             onOpenOrders={() => setActivePage("orders")}
           />
         );

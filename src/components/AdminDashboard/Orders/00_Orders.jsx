@@ -4,7 +4,7 @@ import OrderRow from "./01_OrderRow";
 
 const ORDERS_PER_PAGE = 10;
 
-const Orders = ({ orders, onUpdateOrders }) => {
+const Orders = ({ summary, orders, loading, error }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(orders.length / ORDERS_PER_PAGE);
@@ -13,35 +13,20 @@ const Orders = ({ orders, onUpdateOrders }) => {
     currentPage * ORDERS_PER_PAGE,
   );
 
-  const handleSaveOrder = (orderId, updatedFields) => {
-    onUpdateOrders((currentOrders) =>
-      currentOrders.map((order) =>
-        order.id === orderId ? { ...order, ...updatedFields } : order,
-      ),
-    );
-  };
-
   const stats = [
-    { label: "ALL ORDERS", value: String(orders.length) },
-    {
-      label: "PAYABLE",
-      value: String(
-        orders.filter((order) => order.status === "PAYABLE").length,
-      ),
-    },
-    {
-      label: "RECEIVABLE",
-      value: String(
-        orders.filter((order) => order.status === "RECEIVABLE").length,
-      ),
-    },
-    {
-      label: "COMPLETED",
-      value: String(
-        orders.filter((order) => order.status === "COMPLETED").length,
-      ),
-    },
+    { label: "ALL ORDERS", value: String(summary.allOrders) },
+    { label: "PENDING", value: String(summary.pendingCount) },
+    { label: "PAID", value: String(summary.paidCount) },
+    { label: "CANCELLED", value: String(summary.cancelledCount) },
   ];
+
+  if (loading) {
+    return <section className="text-sm text-gray-500">Loading orders...</section>;
+  }
+
+  if (error) {
+    return <section className="text-sm text-red-500">{error}</section>;
+  }
 
   return (
     <section className="space-y-4">
@@ -94,11 +79,7 @@ const Orders = ({ orders, onUpdateOrders }) => {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {paginatedOrders.map((order) => (
-                <OrderRow
-                  key={order.id}
-                  order={order}
-                  onSaveOrder={handleSaveOrder}
-                />
+                <OrderRow key={order.id} order={order} />
               ))}
             </tbody>
           </table>

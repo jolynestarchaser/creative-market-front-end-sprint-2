@@ -1,6 +1,3 @@
-import artistIcon from "../../assets/images/artist-icon.png";
-import starIcon from "../../assets/images/star-icon.png";
-
 const defaultDescription = [
   "Description ใช้สำหรับแสดงรายละเอียดสินค้า ข้อมูลทั่วไปของชิ้นงาน และจุดเด่นที่อยากให้ผู้ชมเข้าใจก่อนตัดสินใจซื้อ",
   "สามารถวางเป็นข้อความตัวอย่างไว้ก่อนเพื่อดูการจัดวาง spacing ของ layout และค่อยเปลี่ยนเป็นข้อมูลจริงภายหลังได้",
@@ -18,23 +15,9 @@ const ProductInfo = ({ product }) => {
             {product?.name || "Cybernecklace"}
           </h2>
 
-          <div className="flex flex-col gap-3 lg:items-end">
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <img
-                src={artistIcon}
-                alt="Artist icon"
-                className="h-8 w-8 rounded-full object-cover sm:h-9 sm:w-9"
-              />
-              <p className="text-base font-medium tracking-[-0.01em] text-[#4b45a3] sm:text-lg">
-                {product?.artist || "Starchaser"}
-              </p>
-              <img
-                src={starIcon}
-                alt="Star icon"
-                className="h-4 w-4 object-contain sm:h-5 sm:w-5"
-              />
-            </div>
-          </div>
+          <p className="text-base font-medium tracking-[-0.01em] text-[#4b45a3] sm:text-lg lg:text-right">
+            {product?.artist || "Starchaser"}
+          </p>
         </div>
 
         <div className="space-y-3 text-[13px] font-normal leading-6 text-[#3e3a55] sm:text-[15px] md:text-base md:leading-7">

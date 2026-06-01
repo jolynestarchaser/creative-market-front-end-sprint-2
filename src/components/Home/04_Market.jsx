@@ -111,7 +111,7 @@ const Market = () => {
             to="/market"
             className="md:w-1/2 h-full flex flex-col justify-center text-white group relative"
           >
-            <h2 className="text-8xl font-bold uppercase">
+            <h2 className="hidden md:block text-8xl font-bold uppercase">
               <span className="text-[#6D5DD3]">E</span>XPLORING
               <br />
               MARKET

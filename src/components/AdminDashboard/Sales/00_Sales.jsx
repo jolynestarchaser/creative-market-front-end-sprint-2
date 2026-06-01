@@ -3,34 +3,34 @@ import StatsCard from "../Overview/01_StatsCard";
 import SalesChart from "../Overview/02_SalesChart";
 import ProductBreakdown from "../Overview/03_ProductBreakdown";
 
-const stats = [
-  {
-    label: "TOTAL SALES",
-    value: "THB 8,624.50",
-    change: "18.6% from last 30 days",
-    changeDirection: "up",
-  },
-  {
-    label: "ORDER",
-    value: "124",
-    change: "12.3% from last 30 days",
-    changeDirection: "up",
-  },
-  {
-    label: "ITEM SOLD",
-    value: "156",
-    change: "4.7% from last 30 days",
-    changeDirection: "up",
-  },
-  {
-    label: "AVERAGE ORDER VALUE",
-    value: "69.55",
-    change: "5.0% from last 30 days",
-    changeDirection: "up",
-  },
-];
+const formatCurrency = (value, includePrefix = true) => {
+  const formattedValue = Number(value || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
-const Sales = () => {
+  return includePrefix ? `THB ${formattedValue}` : formattedValue;
+};
+
+const Sales = ({ stats, loading, error }) => {
+  const summaryStats = [
+    { label: "TOTAL SALES", value: formatCurrency(stats.totalSales) },
+    { label: "ORDER", value: String(stats.orderCount) },
+    { label: "ITEM SOLD", value: String(stats.itemSold) },
+    {
+      label: "AVERAGE ORDER VALUE",
+      value: formatCurrency(stats.averageOrderValue, false),
+    },
+  ];
+
+  if (loading) {
+    return <section className="text-sm text-gray-500">Loading sales data...</section>;
+  }
+
+  if (error) {
+    return <section className="text-sm text-red-500">{error}</section>;
+  }
+
   return (
     <section className="space-y-4">
       <header className="flex items-center gap-3">
@@ -48,14 +48,14 @@ const Sales = () => {
       </header>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {stats.map((stat) => (
+        {summaryStats.map((stat) => (
           <StatsCard key={stat.label} {...stat} />
         ))}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <SalesChart />
-        <ProductBreakdown />
+        <SalesChart chartData={stats.salesOverview} />
+        <ProductBreakdown items={stats.categoryBreakdown} totalItems={stats.itemSold} />
       </div>
     </section>
   );

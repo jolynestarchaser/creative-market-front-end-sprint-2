@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useCart } from "../../context/CartContext";
 
 const ProductCard = ({ product, isLoggedIn, userRole, onAddToCartSuccess }) => {
   const [toast, setToast] = useState(null); // null | "success" | "error"
   const [adding, setAdding] = useState(false);
+
+  const { refreshCart } = useCart();
 
   // แก้จาก VITE_API_URL
   const serverBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
@@ -37,17 +40,23 @@ const ProductCard = ({ product, isLoggedIn, userRole, onAddToCartSuccess }) => {
     setAdding(true);
     try {
       const res = await fetch(`${apiBaseUrl}/cart/add`, {
-        // 1. แก้ไข Path ให้วิ่งไปรูท /add ตามสเปคหลังบ้าน
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        credentials: "include",
+
         body: JSON.stringify({
-          userId: "mock-user-id-123456", // 2. จำลองค่า userId รอไว้ก่อน (ในอนาคตจะดึงมาจากตัวแปร user ล็อกอินจริงจ้า)
-          productId: product._id, // 3. เปลี่ยนจาก slug มาส่ง _id ของสินค้าจาก MongoDB ไปให้ตามที่หลังบ้านรอรับ
-          quantity: 1, // 4. ส่งจำนวนชิ้นไปให้ตรงเป๊ะ
+          productId: product._id,
+          quantity: 1,
         }),
       });
+
       if (!res.ok) throw new Error();
+
       showToast("success");
+      refreshCart();
 
       if (onAddToCartSuccess) {
         onAddToCartSuccess();

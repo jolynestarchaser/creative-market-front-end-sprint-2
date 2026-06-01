@@ -1,14 +1,6 @@
 import OrderRow from "../Orders/01_OrderRow";
 
-const RecentOrders = ({ orders, onUpdateOrders, onOpenOrders }) => {
-  const handleSaveOrder = (orderId, updatedFields) => {
-    onUpdateOrders((currentOrders) =>
-      currentOrders.map((order) =>
-        order.id === orderId ? { ...order, ...updatedFields } : order,
-      ),
-    );
-  };
-
+const RecentOrders = ({ orders, onOpenOrders }) => {
   return (
     <section className="space-y-4">
       <div>
@@ -36,13 +28,8 @@ const RecentOrders = ({ orders, onUpdateOrders, onOpenOrders }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {orders.slice(0, 6).map((order) => (
-                <OrderRow
-                  key={order.id}
-                  order={order}
-                  onSaveOrder={handleSaveOrder}
-                  placeEditButtonRight
-                />
+              {orders.map((order) => (
+                <OrderRow key={order.id} order={order} />
               ))}
             </tbody>
           </table>

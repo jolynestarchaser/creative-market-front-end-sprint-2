@@ -1,77 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import logo from "../../assets/logos/logo.svg";
-import { Link } from "react-router";
+import { Link } from "react-router-dom"; // แก้ไขตัวนำเข้าจาก react-router เป็น react-router-dom จ้า
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext"; // 🌟 ดึงพลังตะกร้าส่วนกลางมาอัปเดตตัวเลขแบบ Real-time
 
 const Navbar = () => {
+  const { isLoggedIn, user, userRole, logout } = useAuth();
+  const { cartCount } = useCart(); // 🛒 ดึงแต้มสินค้าในตะกร้าจริงจาก MongoDB มาแสดงผลออโต้
+
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState(null); // เก็บข้อมูลโปรไฟล์ผู้ใช้ (เช่นชื่อ, รูปภาพ)
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // สถานะล็อกอิน
-  const [userRole, setUserRole] = useState("user"); // บทบาท: "visitor", "user", "admin"
-  const [cartCount, setCartCount] = useState(3); // จำนวนสินค้าในตะกร้า
-
-  const serverBaseUrl =
-    import.meta.env.VITE_SERVER_URL || "http://localhost:7777";
-  const apiBaseUrl = `${serverBaseUrl}/api`;
-
-  useEffect(() => {
-    // const fetchUserProfile = async () => {
-    //   // ถ้าไม่ได้ล็อกอินก็ไม่ต้องวิ่งไปเรียก API ให้เปลืองแรง Server จ้า
-    //   if (!isLoggedIn) return;
-    //   try {
-    //     // เพื่อนร่วมทีมสามารถระบุ URL API จริงตรงนี้ได้เลย (เช่นดึงข้อมูลผ่านคุกกี้ / Token)
-    //     const response = await fetch(`${apiBaseUrl}/users`, {
-    //       method: "GET",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //         // ถ้าในอนาคตเพื่อนใช้ระบบ Bearer Token ก็สามารถปลดคอมเมนต์ตรงนี้ได้เลยนะจ๊ะ
-    //         // "Authorization": `Bearer ${localStorage.getItem("token")}`
-    //       },
-    //     });
-    //     const data = await response.json();
-    //     if (data.success) {
-    //       // สมมติว่าหลังบ้านส่งมาในรูปแบบ { success: true, data: { username: "Chaiyawat" } }
-    //       setUser(data.data);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching user profile:", error);
-    //   }
-    // };
-    // fetchUserProfile();
-  }, [isLoggedIn]); // ทำงานใหม่ทุกครั้งที่สถานะการล็อกอินเปลี่ยนไปจ้า
-
-  // --- ฟังก์ชันสำหรับการล็อกเอาท์ (เตรียมไว้ให้เพื่อนร่วมทีมมาผูกต่อ) ---
-  const handleLogout = async () => {
-    try {
-      // 1. ถ้าเพื่อนใช้ Cookie: จะต้องเขียน fetch ไปที่หลังบ้านตรงนี้จ้า
-      // await fetch("/api/auth/logout", { method: "POST" });
-
-      // 2. ถ้าเพื่อนใช้ LocalStorage: ล้างข้อมูลฝั่งคลายเอนท์ตรงนี้ได้เลย
-      // localStorage.removeItem("token");
-
-      // 3. รีเซ็ต State ในแอปพลิเคชันกลับไปเป็นเริ่มต้น
-      setIsLoggedIn(false);
-      setUserRole("visitor");
-      setCartCount(0);
-      setIsOpen(false); // ปิดเมนูมือถือด้วยนะจ๊ะ
-
-      console.log("Logged out successfully! ❤️");
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+  // 🚪 ฟังก์ชันกดปุ่ม Logout ตัวจริง (เรียกพลังงานล้างคุกกี้สลายตัวจากกล่องกลาง)
+  const handleLogoutClick = () => {
+    logout();
+    setIsOpen(false); // ปิดแท็บเมนูลัดมือถือด้วยเพื่อความเนี๊ยบจ้า
   };
 
-  // สแตนด์บายฟังก์ชันสำหรับ Fetch ข้อมูลผู้ใช้และตะกร้าเมื่อแอปโหลด
-  /* useEffect(() => {
-    // เพื่อนร่วมทีมสามารถมาเขียน fetch เช็ค token และดึงค่าดั้งเดิมจาก API 
-    // ตัวอย่างโครงสร้าง:
-    // const fetchStatus = async () => { ... }
-    // fetchStatus();
-  }, []);
-  */
-
   return (
-    <nav className="flex justify-between items-center px-8 py-4 bg-black text-white flex-wrap">
+    <nav className="flex justify-between items-center px-8 py-4 bg-black text-white flex-wrap relative z-50">
       {/* 1. Logo Section */}
       <Link
         to="/"
@@ -79,6 +25,7 @@ const Navbar = () => {
       >
         <img src={logo} alt="logo" className="h-7 w-auto " />
       </Link>
+
       {/* 2. Menu Links Section */}
       <ul className="hidden md:flex items-center gap-3 text-xl h-auto font-medium ">
         <Link to="/">
@@ -97,7 +44,6 @@ const Navbar = () => {
 
         {/* ================= Category (Hover Version) ================= */}
         <li className="relative cursor-pointer group py-2">
-          {/* Category */}
           <div className="flex items-center gap-1 hover:text-gray-400 transition-all">
             Category
             <svg
@@ -116,7 +62,6 @@ const Navbar = () => {
             </svg>
           </div>
 
-          {/* Dropdown */}
           <div className="absolute top-full left-0 pt-4 w-56 z-50 hidden group-hover:block">
             <div className="bg-black border border-gray-800 py-3 rounded-sm shadow-2xl animate-fade-in">
               <ul className="flex flex-col text-base text-white">
@@ -142,10 +87,11 @@ const Navbar = () => {
           </div>
         </li>
       </ul>
-      {/* 3. Buttons Section */}
+
+      {/* 3. Buttons Section (Desktop เวอร์ชันหน้าจอใหญ่) */}
       <div className="hidden md:flex items-center gap-6">
         {!isLoggedIn ? (
-          // ---------------- กรณีที่ 1: แขกทั่วไป (Visitor) ----------------
+          // ---------------- กรณีที่ 1: แขกทั่วไป (ยังไม่ได้ล็อกอิน) ----------------
           <>
             <Link to="/login">
               <button className="bg-white text-black px-4 py-2 hover:bg-gray-400 cursor-pointer transition-all w-30 font-medium">
@@ -153,21 +99,20 @@ const Navbar = () => {
               </button>
             </Link>
             <Link to="/register">
-              <button className="bg-black text-white px-4 py-2 hover:bg-white hover:text-black cursor-pointer transition-all w-30 border font-medium">
+              <button className="bg-black text-white px-4 py-2 hover:bg-white hover:text-black cursor-pointer transition-all w-30 border border-white font-medium">
                 Register
               </button>
             </Link>
           </>
         ) : (
-          // ---------------- กรณีที่ล็อกอินแล้ว (User หรือ Admin) ----------------
+          // ---------------- กรณีที่ 2: ล็อกอินเข้าระบบสำเร็จแล้ว ----------------
           <div className="flex items-center gap-6">
-            {/* ส่วนของ ตะกร้าสินค้า: จะแสดงเฉพาะคนที่มีบทบาทเป็น "user" เท่านั้น */}
+            {/* ตะกร้าสินค้าแสดงเฉพาะคนยศ "user" พร้อมตัวเลขจริงนับแต้มรวมสะสม */}
             {userRole === "user" && (
               <Link
                 to="/cart"
                 className="relative cursor-pointer hover:text-gray-400 transition-colors"
               >
-                {/* ไอคอนตะกร้าสินค้าชิคๆ */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -182,7 +127,6 @@ const Navbar = () => {
                     d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                   />
                 </svg>
-                {/* วงกลมตัวเลขสีแดงแจ้งเตือนยอดสินค้าสะสม */}
                 {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center animate-bounce">
                     {cartCount}
@@ -191,17 +135,16 @@ const Navbar = () => {
               </Link>
             )}
 
-            {/* ส่วนของ รูปหัวคน (Profile): พาไปยัง Dashboard ตามบทบาทของผู้ใช้ */}
+            {/* โปรไฟล์พ่นชื่อจริงทักทายอัตโนมัติจากตู้เก็บข้อมูลผู้ใช้ตัวจริงหลังบ้านจ้า */}
             <Link
               to={userRole === "admin" ? "/admin-dashboard" : "/user-dashboard"}
-              className="cursor-pointer hover:text-purple-400 transition-colors flex items-center gap-3" // เพิ่ม gap ให้ห่างกำลังดี
+              className="cursor-pointer hover:text-purple-400 transition-colors flex items-center gap-3"
               title={
                 userRole === "admin"
                   ? "Go to Admin Dashboard"
                   : "Go to User Dashboard"
               }
             >
-              {/* แทรกชื่อผู้ใช้ไว้ด้านหน้าไอคอน: ถ้า user มีข้อมูลให้โชว์ username แต่ถ้าไม่มีให้โชว์ "Loading..." รอไปก่อนจ้า */}
               <span className="text-base font-semibold tracking-wide text-gray-200">
                 {userRole === "admin"
                   ? "Hi, Admin"
@@ -226,9 +169,9 @@ const Navbar = () => {
               </div>
             </Link>
 
-            {/* ปุ่ม Logout สำหรับหน้าจอใหญ่: เพิ่มต่อท้ายตรงนี้เลยจ้า */}
+            {/* ปุ่ม Logout ปลุกคำสั่งล้างสิทธิ์แบบเบ็ดเสร็จร้อยเปอร์เซ็นต์ */}
             <button
-              onClick={handleLogout}
+              onClick={handleLogoutClick}
               className="text-red-400 hover:text-red-500 font-medium cursor-pointer transition-colors text-base border border-red-500/30 px-3 py-1 rounded-sm hover:bg-red-500/10"
             >
               Logout
@@ -237,10 +180,8 @@ const Navbar = () => {
         )}
       </div>
 
-      {/* 4. Mobile Menu Icons  */}
-      {/* Hamburger */}
+      {/* 4. Mobile Menu Icons */}
       <div className="flex md:hidden items-center gap-4 relative z-50">
-        {/* 1. ปุ่มแฮมเบอร์เกอร์ (เปิด/ปิดเมนู) */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="cursor-pointer hover:text-gray-400 transition-colors"
@@ -278,7 +219,6 @@ const Navbar = () => {
           )}
         </button>
 
-        {/* 2. ไอคอนหัวคนสำหรับผู้เยี่ยมชม: จะหายไปทันทีถ้าล็อกอินติดตามที่เธอต้องการเลยจ้า */}
         {!isLoggedIn && (
           <Link
             to="/login"
@@ -300,32 +240,83 @@ const Navbar = () => {
           </Link>
         )}
       </div>
-      {/* 5. Mobile Dropdown Menu  */}
+
+      {/* 5. Mobile Dropdown Menu */}
       {isOpen && (
-        // เรานำกล่องตัวแม่ที่มีคลาส relative z-40 มาครอบไว้ตรงนี้ เพื่อคุมตำแหน่งระดับชั้นของเมนูทั้งหมดจ้า
-        <div className="w-full md:hidden flex flex-col mt-4 border-t border-gray-800 pt-4 pb-2 animate-fade-in relative z-40">
+        <div className="w-full md:hidden flex flex-col mt-4 border-t border-gray-800 pt-4 pb-4 animate-fade-in relative z-40 bg-black">
+          {/* 🌟 [เพิ่มเข้าหลัก]: ลิงก์พื้นฐานและหมวดหมู่โชว์ให้ทุกคนเห็น ไม่ว่าจะล็อกอินหรือไม่ก็ตาม จ้า */}
+          <div className="flex flex-col gap-4 px-2 text-lg font-medium border-b border-gray-800 pb-4">
+            <Link
+              to="/"
+              onClick={() => setIsOpen(false)}
+              className="hover:text-gray-400 py-1"
+            >
+              Home
+            </Link>
+            <Link
+              to="/#about-section"
+              onClick={() => setIsOpen(false)}
+              className="hover:text-gray-400 py-1"
+            >
+              About
+            </Link>
+
+            <div className="text-sm text-gray-500 tracking-widest font-bold uppercase mt-2">
+              Categories
+            </div>
+            <Link
+              to="/market?category=Visual Art"
+              onClick={() => setIsOpen(false)}
+              className="text-base pl-2 text-gray-300 hover:text-white py-1"
+            >
+              · Visual Art
+            </Link>
+            <Link
+              to={`/market?category=${encodeURIComponent("Craft & Handmade")}`}
+              onClick={() => setIsOpen(false)}
+              className="text-base pl-2 text-gray-300 hover:text-white py-1"
+            >
+              · Craft & Handmade
+            </Link>
+            <Link
+              to={`/market?category=${encodeURIComponent("Music & Sound")}`}
+              onClick={() => setIsOpen(false)}
+              className="text-base pl-2 text-gray-300 hover:text-white py-1"
+            >
+              · Music & Sound
+            </Link>
+          </div>
+
+          {/* 🌟 ส่วนควบคุมปุ่มตามสถานะล็อกอินจริง (ย้ายลงมาดักต่อท้ายด้านล่าง) */}
           {!isLoggedIn ? (
-            // ---------- กรณีที่ 1: ยังไม่ล็อกอิน โชว์ปุ่ม Login / Register ตามเดิม ----------
-            <div className="flex gap-4 mt-8 px-2">
-              <Link to="/login" className="w-full">
+            // ---------- เคสมือถือ: ยังไม่ได้ล็อกอิน โชว์ปุ่ม Login / Register ----------
+            <div className="flex gap-4 mt-6 px-2">
+              <Link
+                to="/login"
+                className="w-full"
+                onClick={() => setIsOpen(false)}
+              >
                 <button className="bg-white text-black px-4 py-3 hover:bg-gray-300 transition-all w-full font-bold rounded-sm cursor-pointer">
                   Login
                 </button>
               </Link>
-              <Link to="/register" className="w-full">
+              <Link
+                to="/register"
+                className="w-full"
+                onClick={() => setIsOpen(false)}
+              >
                 <button className="bg-transparent text-white px-4 py-3 hover:bg-gray-800 transition-all w-full border border-white font-bold rounded-sm cursor-pointer">
                   Register
                 </button>
               </Link>
             </div>
           ) : (
-            // ---------- กรณีที่ 2: ล็อกอินติดแล้ว โชว์เมนูลัดเข้าถึงสิทธิ์ตามรูปวาดของเธอ ----------
-            <div className="flex flex-col gap-3 mt-6 border-t border-gray-800 pt-4 px-2">
-              <div className="flex flex-col gap-1 mb-2">
+            // ---------- เคสมือถือ: ล็อกอินแล้ว โชว์ Action ของบัญชี ----------
+            <div className="flex flex-col gap-3 mt-4 px-2">
+              <div className="flex flex-col gap-1 mt-2">
                 <div className="text-sm text-gray-500 tracking-widest font-bold uppercase">
                   Account Actions
                 </div>
-                {/* แสดงชื่อผู้ใช้ตัวหนาๆ สีม่วง/แดงตามสิทธิ์ให้ผู้ใช้ประทับใจจ้า */}
                 <div
                   className={`text-base font-bold ${userRole === "admin" ? "text-red-400" : "text-purple-400"}`}
                 >
@@ -335,12 +326,11 @@ const Navbar = () => {
                 </div>
               </div>
 
-              {/* เมนูตะกร้าสินค้า: โชว์เฉพาะ "user" พร้อมแสดงตัวเลขสะสมข้างๆ */}
               {userRole === "user" && (
                 <Link
                   to="/cart"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-between text-white hover:text-purple-400 py-2 transition-colors"
+                  className="flex items-center justify-between text-white hover:text-purple-400 py-2 transition-colors border-t border-gray-900 mt-1"
                 >
                   <span className="flex items-center gap-3 text-lg font-medium">
                     <svg
@@ -367,7 +357,6 @@ const Navbar = () => {
                 </Link>
               )}
 
-              {/* เมนูหน้าส่วนตัว (Dashboard): คัดแยก Path ปลายทางตามบทบาทอัติโนมัติ */}
               <Link
                 to={
                   userRole === "admin" ? "/admin-dashboard" : "/user-dashboard"
@@ -390,10 +379,9 @@ const Navbar = () => {
                 {userRole === "admin" ? "Admin Dashboard" : "My Dashboard"}
               </Link>
 
-              {/* ปุ่ม Logout สำหรับหน้าจอมือถือ: เพิ่มต่อท้ายด้านล่างสุดของกล่องนี้เลยจ้า */}
               <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 text-red-400 hover:text-red-500 py-3 transition-colors text-lg font-bold border-t border-gray-900 mt-2 cursor-pointer w-full text-left"
+                onClick={handleLogoutClick}
+                className="flex items-center gap-3 text-red-400 hover:text-red-500 py-3 transition-colors text-lg font-bold border-t border-gray-900 mt-2 cursor-pointer w-full text-left bg-transparent"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

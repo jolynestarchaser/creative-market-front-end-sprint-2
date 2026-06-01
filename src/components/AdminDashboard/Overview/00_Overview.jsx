@@ -4,26 +4,31 @@ import SalesChart from "./02_SalesChart";
 import ProductBreakdown from "./03_ProductBreakdown";
 import RecentOrders from "./04_RecentOrders";
 
-const stats = [
-  {
-    label: "TOTAL SALES",
-    value: "฿ 8,624.50",
-  },
-  {
-    label: "ORDER",
-    value: "124",
-  },
-  {
-    label: "ITEM SOLD",
-    value: "156",
-  },
-  {
-    label: "AVERAGE ORDER VALUE",
-    value: "฿ 69.55",
-  },
-];
+const formatCurrency = (value) =>
+  `฿ ${Number(value || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
-const Overview = ({ orders, onUpdateOrders, onOpenOrders }) => {
+const Overview = ({ stats, loading, error, onOpenOrders }) => {
+  const summaryStats = [
+    { label: "TOTAL SALES", value: formatCurrency(stats.totalSales) },
+    { label: "ORDER", value: String(stats.orderCount) },
+    { label: "ITEM SOLD", value: String(stats.itemSold) },
+    {
+      label: "AVERAGE ORDER VALUE",
+      value: formatCurrency(stats.averageOrderValue),
+    },
+  ];
+
+  if (loading) {
+    return <section className="text-sm text-gray-500">Loading dashboard...</section>;
+  }
+
+  if (error) {
+    return <section className="text-sm text-red-500">{error}</section>;
+  }
+
   return (
     <section className="space-y-4">
       <header className="flex items-center gap-3">
@@ -34,26 +39,22 @@ const Overview = ({ orders, onUpdateOrders, onOpenOrders }) => {
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
             Overview
           </h1>
-          <p className="text-sm text-gray-500">เก็บบันทึกสถานะข้อมูลย้อนหลัง</p>
+          <p className="text-sm text-gray-500">Keep track of your sales data</p>
         </div>
       </header>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {stats.map((stat) => (
+        {summaryStats.map((stat) => (
           <StatsCard key={stat.label} {...stat} />
         ))}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <SalesChart />
-        <ProductBreakdown />
+        <SalesChart chartData={stats.salesOverview} />
+        <ProductBreakdown items={stats.categoryBreakdown} totalItems={stats.itemSold} />
       </div>
 
-      <RecentOrders
-        orders={orders}
-        onUpdateOrders={onUpdateOrders}
-        onOpenOrders={onOpenOrders}
-      />
+      <RecentOrders orders={stats.recentOrders} onOpenOrders={onOpenOrders} />
     </section>
   );
 };

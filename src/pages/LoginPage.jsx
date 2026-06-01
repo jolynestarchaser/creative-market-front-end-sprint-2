@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-//import { mockUsers } from '../data/mockUsers';
+import { useAuth } from "../context/AuthContext";
 
 // --- Import รูปภาพ ---
 import bgDesktop from "../assets/images/j-login-bg.jpg";
@@ -9,9 +9,9 @@ import logoLogin from "../assets/icons/creative-logo.svg";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { setIsLoggedIn, setUserRole } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // --- 1. เพิ่มระบบตรวจสอบขนาดหน้าจอแบบ Real-time ---
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [errors, setErrors] = useState({});
   const [isSuccess, setIsSuccess] = useState(false);
@@ -22,7 +22,7 @@ const LoginPage = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     let newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -41,28 +41,42 @@ const LoginPage = () => {
       return;
     }
 
-    /* แก้ไขจุดที่ 3: เช็คว่า mockUsers มีอยู่จริงไหม ถ้าโดนคอมเมนต์ไว้ให้ใช้ [] แทน เพื่อป้องกัน Error และรวมข้อมูลกับ localStorage ได้อย่างปลอดภัย */
-    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-    const availableMockUsers =
-      typeof mockUsers !== "undefined" ? mockUsers : [];
-    const allUsers = [...availableMockUsers, ...storedUsers];
+    try {
+      // ใช้ URL เต็มๆ ยิงตรงไปที่ Backend เลย (ไม่ต้องผ่าน Proxy)
+      const apiBaseUrl =
+        import.meta.env.VITE_API_URL || "http://localhost:7777";
+      const apiUrl = `${apiBaseUrl}/api/auth/login`;
 
-    const user = allUsers.find(
-      (u) => u.email === email && u.password === password,
-    );
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+        // สำคัญมาก: ต้องมี credentials: 'include' เพื่อรับ Cookie
+        credentials: "include",
+      });
 
-    if (user) {
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      setErrors({});
-      setIsSuccess(true);
-    } else {
-      setErrors({ password: "Invalid email or password!!" });
+      const data = await response.json();
+
+      if (response.ok) {
+        setErrors({});
+
+        setIsLoggedIn(true);
+        setUserRole(data.role);
+
+        setIsSuccess(true);
+      } else {
+        setErrors({ password: data.message || "Invalid email or password!!" });
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      setErrors({ password: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้" });
     }
   };
 
   return (
     <div className="fixed align inset-0 min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat md:bg-[url('/path-to-your-desktop-bg.png')] bg-[url('/path-to-your-mobile-bg.png')]">
-      {/* --- 3. ส่วน Background: สลับรูปตาม windowWidth --- */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
         style={{
@@ -72,8 +86,7 @@ const LoginPage = () => {
         }}
       />
 
-      {/* ปรับตรงนี้: เพิ่ม scale-100  */}
-      <div className="flex flex-col justify-center relative z-10  w-full max-w-[540px] md:max-w-[648px] min-h-[600px] md:min-h-[709px] p-8 md:p-10 text-center bg-black/30 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl mx-4 scale-80">
+      <div className="flex flex-col justify-center relative z-10 w-full max-w-[540px] md:max-w-[648px] min-h-[600px] md:min-h-[709px] p-8 md:p-10 text-center bg-black/30 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl mx-4 scale-80">
         <div className="mb-6 md:mb-8 flex justify-center">
           <img
             src={logoLogin}

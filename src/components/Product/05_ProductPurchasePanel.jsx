@@ -1,4 +1,10 @@
-const ProductPurchasePanel = ({ product }) => {
+const ProductPurchasePanel = ({
+  product,
+  onAddToCart,
+  onBuyNow,
+  adding,
+  toast,
+}) => {
   const tags = product?.tags || ["#Handmade"];
   const price = product?.price || 300;
 
@@ -26,9 +32,23 @@ const ProductPurchasePanel = ({ product }) => {
             </p>
           </div>
 
-          <div className="flex w-full flex-col gap-3 sm:w-56 md:w-64">
+          <div className="relative flex w-full flex-col gap-3 sm:w-56 md:w-64">
+            {toast && (
+              <div
+                className={`absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold text-white shadow-lg transition-all ${
+                  toast === "success" ? "bg-green-500" : "bg-red-500"
+                }`}
+              >
+                {toast === "success"
+                  ? "✓ Added to cart!"
+                  : "✗ Failed, try again"}
+              </div>
+            )}
+
             <button
               type="button"
+              onClick={onAddToCart}
+              disabled={adding}
               className="w-full rounded-lg bg-[#534AB7] px-6 py-3.5 text-lg font-semibold tracking-[0.01em] text-white transition hover:bg-[#2f295f] sm:py-4 sm:text-xl"
               aria-label="Add to cart"
             >
@@ -37,6 +57,8 @@ const ProductPurchasePanel = ({ product }) => {
 
             <button
               type="button"
+              onClick={onBuyNow}
+              disabled={adding}
               className="w-full rounded-lg bg-[#393276] px-6 py-3.5 text-lg font-semibold tracking-[0.01em] text-white transition hover:bg-[#2f295f] sm:py-4 sm:text-xl"
             >
               BUY NOW

@@ -1,23 +1,51 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const MAX_SUGGESTIONS = 5;
 
-const ProductHeaderBar = ({ category = "Craft & Handmade", products = [] }) => {
+const ProductHeaderBar = ({ category = "Craft & Handmade" }) => {
   const [searchText, setSearchText] = useState("");
-  const normalizedSearch = searchText.trim().toLowerCase();
+  const [suggestions, setSuggestions] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const suggestions = useMemo(() => {
-    if (!normalizedSearch) return [];
+  const trimmedSearch = searchText.trim();
+  const shouldShowDropdown = trimmedSearch.length > 0;
 
-    return products
-      .filter((product) =>
-        product.name.toLowerCase().startsWith(normalizedSearch)
-      )
-      .slice(0, MAX_SUGGESTIONS);
-  }, [normalizedSearch, products]);
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (!trimmedSearch) {
+        setSuggestions([]);
+        return;
+      }
 
-  const shouldShowDropdown = searchText.trim().length > 0;
+      try {
+        setIsSearching(true);
+
+        const response = await fetch(
+          `http://localhost:7777/api/products?search=${encodeURIComponent(
+            trimmedSearch,
+          )}`,
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Failed to search products");
+        }
+
+        setSuggestions(result.data.slice(0, MAX_SUGGESTIONS));
+      } catch (error) {
+        console.error("Search error:", error);
+        setSuggestions([]);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const delaySearch = setTimeout(fetchSearchResults, 300);
+
+    return () => clearTimeout(delaySearch);
+  }, [trimmedSearch]);
 
   return (
     <section className="w-full bg-[#eeecfb]">
@@ -30,6 +58,7 @@ const ProductHeaderBar = ({ category = "Craft & Handmade", products = [] }) => {
             <label htmlFor="product-search" className="sr-only">
               Search product
             </label>
+
             <div className="flex items-center rounded-xl border-2 border-[#393276] bg-white px-3 py-2.5 md:px-4 md:py-3">
               <input
                 id="product-search"
@@ -39,6 +68,7 @@ const ProductHeaderBar = ({ category = "Craft & Handmade", products = [] }) => {
                 onChange={(event) => setSearchText(event.target.value)}
                 className="w-full bg-transparent text-sm font-medium tracking-[0.01em] text-[#393276] outline-none placeholder:font-normal placeholder:text-[#6c67b0] md:text-base"
               />
+
               <button
                 type="submit"
                 className="ml-3 text-[#4b45a3]"
@@ -60,7 +90,11 @@ const ProductHeaderBar = ({ category = "Craft & Handmade", products = [] }) => {
 
             {shouldShowDropdown && (
               <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-80 overflow-y-auto rounded-xl border border-[#b7b2d7] bg-white shadow-xl">
-                {suggestions.length > 0 ? (
+                {isSearching ? (
+                  <p className="px-4 py-4 text-sm font-medium text-[#6b648b]">
+                    Searching...
+                  </p>
+                ) : suggestions.length > 0 ? (
                   <ul className="divide-y divide-[#eeecfb]">
                     {suggestions.map((product) => {
                       const thumbnail = product.images?.[0];
@@ -68,7 +102,7 @@ const ProductHeaderBar = ({ category = "Craft & Handmade", products = [] }) => {
                         product.description?.[0] || product.category;
 
                       return (
-                        <li key={product.slug}>
+                        <li key={product._id || product.slug}>
                           <Link
                             to={`/product/${product.slug}`}
                             className="flex gap-3 px-3 py-3 transition hover:bg-[#f5f3ff]"

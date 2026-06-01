@@ -1,56 +1,51 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import product1 from "../../assets/images/cyber-necklace-01.png";
-import product2 from "../../assets/images/cyber-necklace-02.png";
-import product3 from "../../assets/images/cyber-necklace-03.png";
-import product4 from "../../assets/images/cyber-necklace-04.png";
 
-const defaultProductImages = [product1, product2, product3, product4];
-
-const ProductGallery = ({ images = defaultProductImages }) => {
-  const productImages = images.length ? images : defaultProductImages;
-  const [selectedImage, setSelectedImage] = useState(productImages[0]);
-
-  useEffect(() => {
-    setSelectedImage(productImages[0]);
-  }, [productImages]);
+const ProductGallery = ({ images = [product1] }) => {
+  const mainImage = images?.[0] || product1;
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <section className="w-full">
       <div className="overflow-hidden border border-[#6b648b] bg-white">
-        <div className="aspect-[4/4.8] w-full bg-white sm:aspect-[4/5]">
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="block aspect-[4/4.8] w-full bg-white sm:aspect-[4/5]"
+          aria-label="View larger product image"
+        >
           <img
-            src={selectedImage}
-            alt="Selected product"
+            src={mainImage}
+            alt="Product"
             className="h-full w-full object-cover"
           />
-        </div>
-
-        <div className="grid grid-cols-4 gap-1 border-t border-[#6b648b] bg-white p-1">
-          {productImages.map((image, index) => {
-            const isActive = selectedImage === image;
-
-            return (
-              <button
-                key={image}
-                type="button"
-                onClick={() => setSelectedImage(image)}
-                className={`aspect-square cursor-pointer overflow-hidden border transition-colors ${
-                  isActive ? "border-[#393276]" : "border-[#6b648b]"
-                }`}
-                aria-label={`View product image ${index + 1}`}
-              >
-                <img
-                  src={image}
-                  alt={`Product thumbnail ${index + 1}`}
-                  className={`h-full w-full object-cover transition ${
-                    isActive ? "opacity-100" : "opacity-70 hover:opacity-100"
-                  }`}
-                />
-              </button>
-            );
-          })}
-        </div>
+        </button>
       </div>
+
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/70 px-4 py-8"
+          onClick={() => setIsOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            className="fixed right-6 top-6 z-10 rounded-full bg-white px-3 py-1 text-xl font-bold text-[#393276] shadow"
+            aria-label="Close larger product image"
+          >
+            ×
+          </button>
+
+          <div className="mx-auto flex w-full justify-center">
+            <img
+              src={mainImage}
+              alt="Product enlarged"
+              className="w-full max-w-5xl rounded-lg bg-white object-contain shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 };

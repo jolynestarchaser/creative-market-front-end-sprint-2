@@ -1,5 +1,5 @@
 const OrdersHistory = ({ orders, onOpenOrders }) => {
-  const historyOrders = orders.slice(3, 6);
+  const historyOrders = orders.slice(0, 3);
 
   return (
     <div>
@@ -24,28 +24,51 @@ const OrdersHistory = ({ orders, onOpenOrders }) => {
               </tr>
             </thead>
             <tbody>
-              {historyOrders.map((order) => (
-                <tr
-                  key={order.id}
-                  className="border-b border-gray-200 last:border-b-0"
-                >
-                  <td className="py-4 pl-4 md:pl-8">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={order.image}
-                        alt={order.product}
-                        className="h-12 w-12 rounded-2xl object-cover"
-                      />
-                      <span className="text-sm font-medium text-gray-800">
-                        {order.product}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-4 pr-4 text-right text-sm font-semibold text-gray-900 md:pr-8">
-                    {order.price}
+              {historyOrders.length > 0 ? (
+                historyOrders.map((order) => (
+                  <tr
+                    key={order.id}
+                    className="border-b border-gray-200 last:border-b-0"
+                  >
+                    <td className="py-4 pl-4 md:pl-8">
+                      <div className="flex items-center gap-3">
+                        {order.image ? (
+                          <img
+                            src={order.image}
+                            alt={order.name}
+                            className="h-12 w-12 rounded-2xl object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-100 text-sm font-semibold text-gray-500">
+                            {order.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <span className="text-sm font-medium text-gray-800">
+                            {order.name}
+                          </span>
+                          <p className="mt-1 text-xs text-gray-400">
+                            {order.quantity} item
+                            {order.quantity > 1 ? "s" : ""}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 pr-4 text-right text-sm font-semibold text-gray-900 md:pr-8">
+                      ฿{order.lineTotal.toLocaleString("en-US")}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="2"
+                    className="px-4 py-6 text-center text-sm text-gray-400 md:px-8"
+                  >
+                    No paid orders yet.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

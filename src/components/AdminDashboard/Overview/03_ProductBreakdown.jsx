@@ -1,17 +1,6 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
-const items = [
-  { label: "Visual Art", sold: "68 ชิ้น", value: 68, color: "#6366f1" },
-  {
-    label: "Craft & Handmade",
-    sold: "52 ชิ้น",
-    value: 52,
-    color: "#8b5cf6",
-  },
-  { label: "Music & Sound", sold: "36 ชิ้น", value: 36, color: "#c4b5fd" },
-];
-
-const ProductBreakdown = () => {
+const ProductBreakdown = ({ items, totalItems }) => {
   return (
     <article className="rounded-2xl bg-white p-5 md:p-6">
       <h2 className="text-lg font-bold text-gray-900">
@@ -40,7 +29,7 @@ const ProductBreakdown = () => {
           </ResponsiveContainer>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-bold text-gray-900">156</span>
+            <span className="text-2xl font-bold text-gray-900">{totalItems}</span>
             <span className="text-sm text-gray-400">units</span>
           </div>
         </div>

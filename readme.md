@@ -4,6 +4,9 @@
 
 [![Live Demo](https://img.shields.io/badge/demo-online-brightgreen.svg)(https://creative-market-front-end-sprint-2-mu.vercel.app/)
 ---
+Software Architecture & Project Blueprint
+https://www.figma.com/board/knELaqlKa8ARUQofT0FwEE/Commit-no-Jutsu?node-id=480-986&t=c1UFc62fAUL5XE5Y-0
+---
 
 ## ✨ Key Features
 

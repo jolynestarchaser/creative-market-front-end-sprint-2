@@ -1,17 +1,22 @@
-import { useMemo, useState } from "react";
-import { statusLabels } from "../../../data/dashboardOrders";
+import { useState } from "react";
 import OrderCard from "./01_OrderCard";
 
 const tabs = [
   { label: "All", value: "All" },
-  { label: "ที่ต้องชำระ", value: "PAYABLE" },
-  { label: "ที่ต้องได้รับ", value: "RECEIVABLE" },
-  { label: "สำเร็จแล้ว", value: "COMPLETED" },
+  { label: "รอดำเนินการ", value: "pending" },
+  { label: "สำเร็จแล้ว", value: "paid" },
+  { label: "ยกเลิก", value: "cancelled" },
 ];
 
 const ordersPerPage = 5;
 
-const MyOrders = ({ orders }) => {
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value || 0);
+
+const MyOrders = ({ orders, summary, loading, error }) => {
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -26,30 +31,21 @@ const MyOrders = ({ orders }) => {
     currentPage * ordersPerPage,
   );
 
-  const totalSpend = useMemo(
-    () =>
-      orders
-        .reduce(
-          (sum, order) => sum + Number(order.price.replace(/[^\d.]/g, "")),
-          0,
-        )
-        .toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }),
-    [orders],
-  );
-
   const orderStats = [
-    { label: "Total orders", value: String(orders.length) },
-    { label: "Total spend", value: `฿${totalSpend}` },
-    {
-      label: "Completed",
-      value: String(
-        orders.filter((order) => order.status === "COMPLETED").length,
-      ),
-    },
+    { label: "Total orders", value: String(summary.totalOrders) },
+    { label: "Total spend", value: `฿${formatCurrency(summary.totalSpend)}` },
+    { label: "Completed", value: String(summary.completedOrders) },
   ];
+
+  if (loading) {
+    return (
+      <section className="text-sm text-gray-500">Loading orders...</section>
+    );
+  }
+
+  if (error) {
+    return <section className="text-sm text-red-500">{error}</section>;
+  }
 
   return (
     <section className="space-y-6">
@@ -57,7 +53,9 @@ const MyOrders = ({ orders }) => {
         <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
           My Orders
         </h1>
-        <p className="mt-1 text-sm text-gray-400">คำสั่งซื้อของฉัน</p>
+        <p className="mt-1 text-sm text-gray-400">
+          Order items from your account
+        </p>
       </header>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -99,13 +97,15 @@ const MyOrders = ({ orders }) => {
       </div>
 
       <div className="space-y-4">
-        {paginatedOrders.map((order) => (
-          <OrderCard
-            key={order.id}
-            order={order}
-            statusLabel={statusLabels[order.status]}
-          />
-        ))}
+        {paginatedOrders.length > 0 ? (
+          paginatedOrders.map((order) => (
+            <OrderCard key={order.id} order={order} />
+          ))
+        ) : (
+          <div className="rounded-2xl bg-white p-6 text-sm text-gray-400">
+            No orders found for this filter.
+          </div>
+        )}
       </div>
 
       {totalPages > 1 && (

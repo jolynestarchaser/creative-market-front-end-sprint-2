@@ -1,9 +1,7 @@
-import { statusLabels } from "../../../data/dashboardOrders";
-
 const statusClasses = {
-  COMPLETED: "bg-emerald-100 text-emerald-600",
-  PAYABLE: "bg-amber-100 text-amber-600",
-  RECEIVABLE: "bg-sky-100 text-sky-600",
+  pending: "bg-amber-100 text-amber-600",
+  paid: "bg-emerald-100 text-emerald-600",
+  cancelled: "bg-rose-100 text-rose-600",
 };
 
 const OrdersStatus = ({ orders, onOpenOrders }) => {
@@ -33,35 +31,58 @@ const OrdersStatus = ({ orders, onOpenOrders }) => {
               </tr>
             </thead>
             <tbody>
-              {recentOrders.map((order) => (
-                <tr
-                  key={order.id}
-                  className="border-b border-gray-200 last:border-b-0"
-                >
-                  <td className="py-4 pl-4 md:pl-8">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={order.image}
-                        alt={order.product}
-                        className="h-12 w-12 rounded-2xl object-cover"
-                      />
-                      <span className="text-sm font-medium text-gray-800">
-                        {order.product}
+              {recentOrders.length > 0 ? (
+                recentOrders.map((order) => (
+                  <tr
+                    key={order.id}
+                    className="border-b border-gray-200 last:border-b-0"
+                  >
+                    <td className="py-4 pl-4 md:pl-8">
+                      <div className="flex items-center gap-3">
+                        {order.image ? (
+                          <img
+                            src={order.image}
+                            alt={order.name}
+                            className="h-12 w-12 rounded-2xl object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-100 text-sm font-semibold text-gray-500">
+                            {order.name.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <span className="text-sm font-medium text-gray-800">
+                            {order.name}
+                          </span>
+                          <p className="mt-1 text-xs text-gray-400">
+                            {order.quantity} item
+                            {order.quantity > 1 ? "s" : ""}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[order.status]}`}
+                      >
+                        {order.statusLabel}
                       </span>
-                    </div>
-                  </td>
-                  <td className="py-4">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[order.status]}`}
-                    >
-                      {statusLabels[order.status]}
-                    </span>
-                  </td>
-                  <td className="py-4 pr-4 text-right text-sm font-semibold text-gray-900 md:pr-8">
-                    {order.price}
+                    </td>
+                    <td className="py-4 pr-4 text-right text-sm font-semibold text-gray-900 md:pr-8">
+                      ฿{order.lineTotal.toLocaleString("en-US")}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan="3"
+                    className="px-4 py-6 text-center text-sm text-gray-400 md:px-8"
+                  >
+                    No pending orders yet.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

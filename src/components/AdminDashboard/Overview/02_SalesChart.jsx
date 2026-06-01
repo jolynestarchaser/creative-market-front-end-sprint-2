@@ -8,17 +8,7 @@ import {
   YAxis,
 } from "recharts";
 
-const chartData = [
-  { label: "Mon", sales: 980 },
-  { label: "Tue", sales: 1124.5 },
-  { label: "Wed", sales: 1060 },
-  { label: "Thu", sales: 1240 },
-  { label: "Fri", sales: 1340 },
-  { label: "Sat", sales: 1370 },
-  { label: "Sun", sales: 1510 },
-];
-
-const SalesChart = () => {
+const SalesChart = ({ chartData }) => {
   return (
     <article className="rounded-2xl bg-white p-5 md:p-6">
       <div className="flex items-start justify-between gap-4">
