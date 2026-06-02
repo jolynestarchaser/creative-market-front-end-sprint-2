@@ -20,14 +20,15 @@ const useCheckoutActions = () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        // เพื่อนส่งมาเป็น Object เดียว (เพราะหน้า Profile เขาทำแบบ 1 user 1 address)
-        // แต่ระบบ Checkout เราเผื่อไว้เป็น Array ดังนั้นจะห่อไว้ถ้ามีข้อมูล
+        // เพื่อนส่งมาเป็น Object เดียว { recipientName, ... }
+        // ถ้ามีข้อมูล เราจะเก็บใส่ Array 1 ตัวเพื่อให้ Loop ง่าย หรือถ้าไม่มีก็เป็น Array ว่าง
         setAddresses(data.data ? [data.data] : []);
       } else {
-        throw new Error(data.message || "Failed to fetch address");
+        // กรณีไม่มีข้อมูล (404 หรือ success: false จาก backend บางตัว) ให้เป็นว่าง
+        setAddresses([]);
       }
     } catch (err) {
-      setError(err.message);
+      setAddresses([]);
       console.error("Fetch address error:", err);
     } finally {
       setLoading(false);
@@ -36,6 +37,7 @@ const useCheckoutActions = () => {
 
   // 2. บันทึกที่อยู่ใหม่/อัปเดต (ใช้ PUT ตามแบบของเพื่อน)
   const addAddress = async (addressData) => {
+    setLoading(true);
     try {
       const res = await fetch(`${serverBaseUrl}/api/user-dashboard/my-address`, {
         method: "PUT",
@@ -53,11 +55,14 @@ const useCheckoutActions = () => {
     } catch (err) {
       alert(err.message);
       return null;
+    } finally {
+      setLoading(false);
     }
   };
 
-  // 3. ลบที่อยู่
+  // 3. ลบที่อยู่ (ลบทั้ง Object ทิ้ง)
   const deleteAddress = async () => {
+    setLoading(true);
     try {
       const res = await fetch(`${serverBaseUrl}/api/user-dashboard/my-address`, {
         method: "DELETE",
@@ -66,11 +71,15 @@ const useCheckoutActions = () => {
       const data = await res.json();
       if (res.ok && data.success) {
         await fetchAddresses();
+        return true;
       } else {
         throw new Error(data.message || "Failed to delete address");
       }
     } catch (err) {
       alert(err.message);
+      return false;
+    } finally {
+      setLoading(false);
     }
   };
 
