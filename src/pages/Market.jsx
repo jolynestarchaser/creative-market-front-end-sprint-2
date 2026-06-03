@@ -4,6 +4,12 @@ import ProductCard from "../components/Market/ProductCard";
 import MarketHeader from "../components/Market/MarketHeader";
 import { useAuth } from "../context/AuthContext";
 
+const PRODUCTS_PER_PAGE = 8;
+
+const serverBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+
+const apiBaseUrl = `${serverBaseUrl}/api`;
+
 const Market = () => {
   // 🌟 2. ดึงค่าสถานะสิทธิ์ที่แอบถอดรหัสจากคุกกี้จริงหลังบ้านมาใช้งานแทนค่าทดสอบเดิมจ้า
   const { isLoggedIn, userRole } = useAuth();
@@ -14,39 +20,92 @@ const Market = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   const activeCategory = searchParams.get("category") || "All";
   const categories = ["All", "Visual Art", "Craft & Handmade", "Music & Sound"];
 
-  const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+  useEffect(() => {
+    const delaySearch = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+      setPage(1);
+    }, 300);
+
+    return () => clearTimeout(delaySearch);
+  }, [searchQuery]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`${apiBaseUrl}/api/products`);
+        setLoading(true);
+
+        const params = new URLSearchParams({
+          page: "1",
+          limit: String(PRODUCTS_PER_PAGE),
+        });
+
+        if (debouncedSearch) {
+          params.set("search", debouncedSearch);
+        } else if (activeCategory !== "All") {
+          params.set("category", activeCategory);
+        }
+
+        const res = await fetch(`${apiBaseUrl}/products?${params.toString()}`);
         const data = await res.json();
-        if (data.success) setProducts(data.data);
+
+        if (data.success) {
+          setProducts(data.data);
+          setHasMore(data.pagination?.hasMore || false);
+          setPage(1);
+        }
       } catch (err) {
         console.error("Fetch products failed:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchProducts();
-  }, [apiBaseUrl]);
+  }, [debouncedSearch, activeCategory]);
 
   const handleCategoryChange = (newCategory) => {
     setSearchParams({ category: newCategory });
   };
 
-  // ── Filter (ทำงานกับข้อมูลจริง) ──
-  const filteredProducts = products.filter((product) => {
-    const matchSearch = product.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchCategory =
-      activeCategory === "All" || product.category === activeCategory;
-    return matchSearch && matchCategory;
-  });
+  const handleLoadMore = async () => {
+    try {
+      setIsLoadingMore(true);
+
+      const nextPage = page + 1;
+
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        limit: String(PRODUCTS_PER_PAGE),
+      });
+
+      if (debouncedSearch) {
+        params.set("search", debouncedSearch);
+      } else if (activeCategory !== "All") {
+        params.set("category", activeCategory);
+      }
+
+      const res = await fetch(`${apiBaseUrl}/products?${params.toString()}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setProducts((prevProducts) => [...prevProducts, ...data.data]);
+        setHasMore(data.pagination?.hasMore || false);
+        setPage(nextPage);
+      }
+    } catch (err) {
+      console.error("Load more products failed:", err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   // ── Skeleton Cards ──
   const SkeletonCard = () => (
@@ -85,8 +144,8 @@ const Market = () => {
           {loading ? (
             // skeleton 8 ช่อง
             Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
-          ) : filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
+          ) : products.length > 0 ? (
+            products.map((product) => (
               <Link key={product._id} to={`/product/${product.slug}`}>
                 <ProductCard
                   product={product}
@@ -103,6 +162,19 @@ const Market = () => {
             </div>
           )}
         </div>
+
+        {hasMore && !loading && (
+          <div className="mt-10 flex justify-center">
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              disabled={isLoadingMore}
+              className="rounded-lg bg-[#6D5DD3] px-8 py-3 font-semibold text-white transition hover:bg-[#5b4db8] disabled:opacity-60"
+            >
+              {isLoadingMore ? "Loading..." : "Load more"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
