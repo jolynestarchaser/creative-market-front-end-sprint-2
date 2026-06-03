@@ -1,14 +1,10 @@
 import { useState, useCallback } from "react";
-import { useCart } from "../../context/CartContext";
 
 const serverBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
 
 const useCheckoutActions = () => {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  
-  const { refreshCart } = useCart();
 
   // 1. ดึงรายการที่อยู่ (ปรับให้ใช้เส้นเดียวกับหน้า Profile เพื่อน)
   const fetchAddresses = useCallback(async () => {
@@ -111,7 +107,6 @@ const useCheckoutActions = () => {
   return {
     addresses,
     loading,
-    error,
     fetchAddresses,
     addAddress,
     deleteAddress,
