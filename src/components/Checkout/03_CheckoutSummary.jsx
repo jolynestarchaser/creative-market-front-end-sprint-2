@@ -45,22 +45,28 @@ export default function CheckoutSummary({
   return (
     <div className="space-y-4">
       <div className="border border-[#4C1D95] rounded-lg p-4 bg-white/50 space-y-4">
-        {cartItems.map(item => (
-          <div key={item._id || item.id || item.productId?._id || Math.random()} className="flex gap-4 border-b border-purple-200 pb-4 last:border-0 last:pb-0">
-            <img 
-              src={item.image || item.productId?.image || "https://placehold.co/100x100"} 
-              alt={item.name || item.productId?.name}
-              className="w-16 h-16 bg-[#D9D9D9] rounded-sm shrink-0 object-cover"
-            />
-            <div className="flex flex-col justify-between py-1">
-              <div>
-                <h4 className="font-bold text-sm text-[#1E1B4B]">{item.name || item.productId?.name}</h4>
-                <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
+        {cartItems.map(item => {
+          const product = item.productId || {};
+          return (
+            <div key={item._id || item.id || product._id || Math.random()} className="flex gap-4 border-b border-purple-200 pb-4 last:border-0 last:pb-0">
+              <img 
+                src={product.images?.[0] || item.image || "https://placehold.co/100x100"} 
+                alt={product.name || item.name}
+                className="w-16 h-16 bg-[#D9D9D9] rounded-sm shrink-0 object-cover"
+              />
+              <div className="flex flex-col justify-between py-1">
+                <div>
+                  {/* ⭐️ แก้ไข: แสดง Tags แทนชื่อสินค้าเพื่อความสอดคล้อง */}
+                  <h4 className="font-bold text-sm text-[#1E1B4B]">
+                    {product.tags && product.tags.length > 0 ? product.tags.join(" ") : (product.name || item.name)}
+                  </h4>
+                  <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
+                </div>
+                <p className="font-bold text-sm">฿ {((product.price || item.price || 0)).toLocaleString()}.-</p>
               </div>
-              <p className="font-bold text-sm">฿ {((item.price || item.productId?.price || 0)).toLocaleString()}.-</p>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="border border-[#4C1D95] rounded-lg p-5 bg-white/50">
