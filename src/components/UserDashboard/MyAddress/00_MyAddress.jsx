@@ -241,14 +241,14 @@ const MyAddress = () => {
         </div>
       )}
 
-      {mode === "view" && address && (
+      {mode === "view" && address ? (
         <AddressCard
           address={address}
           onEdit={handleEdit}
           onDelete={handleDelete}
           submitting={submitting}
         />
-      )}
+      ) : null}
     </section>
   );
 };

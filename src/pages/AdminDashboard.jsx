@@ -23,7 +23,13 @@ const AdminDashboard = () => {
           />
         );
       case "sales":
-        return <Sales />;
+        return (
+          <Sales
+            stats={dashboardData.sales}
+            loading={loading}
+            error={error}
+          />
+        );
       case "artist-drop":
         return <ArtistDrop />;
       case "overview":

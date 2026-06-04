@@ -30,7 +30,7 @@ const ProductBreakdown = ({ items, totalItems }) => {
 
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-2xl font-bold text-gray-900">{totalItems}</span>
-            <span className="text-sm text-gray-400">units</span>
+            <span className="text-sm text-gray-400">items</span>
           </div>
         </div>
       </div>

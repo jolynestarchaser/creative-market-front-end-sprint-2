@@ -12,9 +12,9 @@ const formatCurrency = (value) =>
 
 const Overview = ({ stats, loading, error, onOpenOrders }) => {
   const summaryStats = [
-    { label: "TOTAL SALES", value: formatCurrency(stats.totalSales) },
-    { label: "ORDER", value: String(stats.orderCount) },
-    { label: "ITEM SOLD", value: String(stats.itemSold) },
+    { label: "TOTAL REVENUE", value: formatCurrency(stats.totalSales) },
+    { label: "TOTAL ORDERS", value: String(stats.orderCount) },
+    { label: "TOTAL ITEMS", value: String(stats.itemSold) },
     {
       label: "AVERAGE ORDER VALUE",
       value: formatCurrency(stats.averageOrderValue),
@@ -51,7 +51,10 @@ const Overview = ({ stats, loading, error, onOpenOrders }) => {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <SalesChart chartData={stats.salesOverview} />
-        <ProductBreakdown items={stats.categoryBreakdown} totalItems={stats.itemSold} />
+        <ProductBreakdown
+          items={stats.categoryBreakdown}
+          totalItems={stats.itemSold}
+        />
       </div>
 
       <RecentOrders orders={stats.recentOrders} onOpenOrders={onOpenOrders} />

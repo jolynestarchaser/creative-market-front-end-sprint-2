@@ -65,9 +65,9 @@ const useAdminDashboard = () => {
         }
 
         setDashboardData({
-          overview: responses[0].data,
-          orders: responses[1].data,
-          sales: responses[2].data,
+          overview: responses[0]?.data || initialState.overview,
+          orders: responses[1]?.data || initialState.orders,
+          sales: responses[2]?.data || initialState.sales,
         });
       } catch (fetchError) {
         if (fetchError.name === "AbortError") {

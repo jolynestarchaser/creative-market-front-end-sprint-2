@@ -3,23 +3,30 @@ import StatsCard from "../Overview/01_StatsCard";
 import SalesChart from "../Overview/02_SalesChart";
 import ProductBreakdown from "../Overview/03_ProductBreakdown";
 
-const formatCurrency = (value, includePrefix = true) => {
-  const formattedValue = Number(value || 0).toLocaleString("en-US", {
+const formatCurrency = (value) =>
+  `฿ ${Number(value || 0).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  });
-
-  return includePrefix ? `THB ${formattedValue}` : formattedValue;
-};
+  })}`;
 
 const Sales = ({ stats, loading, error }) => {
+  const safeStats = {
+    totalSales: 0,
+    orderCount: 0,
+    itemSold: 0,
+    averageOrderValue: 0,
+    salesOverview: [],
+    categoryBreakdown: [],
+    ...(stats || {}),
+  };
+
   const summaryStats = [
-    { label: "TOTAL SALES", value: formatCurrency(stats.totalSales) },
-    { label: "ORDER", value: String(stats.orderCount) },
-    { label: "ITEM SOLD", value: String(stats.itemSold) },
+    { label: "TOTAL REVENUE", value: formatCurrency(safeStats.totalSales) },
+    { label: "TOTAL ORDERS", value: String(safeStats.orderCount) },
+    { label: "TOTAL ITEMS", value: String(safeStats.itemSold) },
     {
       label: "AVERAGE ORDER VALUE",
-      value: formatCurrency(stats.averageOrderValue, false),
+      value: formatCurrency(safeStats.averageOrderValue),
     },
   ];
 
@@ -54,8 +61,11 @@ const Sales = ({ stats, loading, error }) => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <SalesChart chartData={stats.salesOverview} />
-        <ProductBreakdown items={stats.categoryBreakdown} totalItems={stats.itemSold} />
+        <SalesChart chartData={safeStats.salesOverview} />
+        <ProductBreakdown
+          items={safeStats.categoryBreakdown}
+          totalItems={safeStats.itemSold}
+        />
       </div>
     </section>
   );
