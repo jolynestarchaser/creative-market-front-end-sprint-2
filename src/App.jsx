@@ -1,5 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import LoadingScreen from "./components/Loading/Loading";
 
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
@@ -91,7 +93,7 @@ const router = createBrowserRouter([
         path: "/forgot-password",
         element: <ForgotPassword />,
       },
-     {
+      {
         path: "/reset-password/:token",
         element: <ResetPassword />,
       },
@@ -100,11 +102,17 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+  // ➕ 1. เพิ่ม State สำหรับเช็คสถานะการ Loading (เริ่มต้นเป็น true เพื่อให้โชว์หน้าโหลดก่อน)
+  const [isLoading, setIsLoading] = useState(window.location.pathname === "/");
+
   useEffect(() => {
+    // ตั้งค่า Lenis Scroll (เรียกใช้งานปกติ)
     const lenis = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // เคลื่อนไหวสมูทแบบอินเตอร์
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     });
+
+    window.lenis = lenis;
 
     function raf(time) {
       lenis.raf(time);
@@ -113,13 +121,29 @@ function App() {
 
     requestAnimationFrame(raf);
 
-    // เคลียร์ค่าทิ้งเมื่อ component ถูกทำลาย
     return () => {
       lenis.destroy();
+      window.lenis = null;
     };
   }, []);
 
-  return <RouterProvider router={router} />;
+  // ➕ 2. ฟังก์ชันที่จะถูกเรียกเมื่อแอนิเมชันเติมน้ำในคอมโพเนนต์ Loading ทำงานจนเต็มและจบลง
+  const handleLoadingComplete = () => {
+    setIsLoading(false); // ปลดล็อกหน้าจอ เพื่อเข้าสู่หน้าเว็บหลัก
+  };
+
+  // ➕ 3. ปรับเงื่อนไขในส่วนของการ Return หน้าจอออกไปแสดงผล
+  return (
+    <>
+      {isLoading ? (
+        // ส่งฟังก์ชันต้อนรับเมื่อโหลดเสร็จผ่าน prop ชื่อ onComplete ไปให้คอมโพเนนต์ Loading
+        <LoadingScreen onComplete={handleLoadingComplete} />
+      ) : (
+        // พอโหลดเสร็จแล้ว ค่อยยอมให้แสดงหน้าเว็บและระบบเปลี่ยนหน้า (Router) ทำงาน
+        <RouterProvider router={router} />
+      )}
+    </>
+  );
 }
 
 export default App;

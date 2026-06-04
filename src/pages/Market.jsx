@@ -144,7 +144,7 @@ const Market = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F7FF] py-8 px-4 md:px-12 font-['Anuphan',sans-serif]">
+    <div className="min-h-screen bg-[#FFFFFF] py-8 px-4 md:px-12 font-['Anuphan',sans-serif]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <MarketHeader
