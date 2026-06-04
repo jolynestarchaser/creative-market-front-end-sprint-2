@@ -82,12 +82,3 @@ export default function Cart() {
     </div>
   );
 }
-
-//  <CartSummary subtotal={subtotal} />
-//             </div>
-//           </div>
-//         )}
-//       </main>
-//     </div>
-//   );
-// }

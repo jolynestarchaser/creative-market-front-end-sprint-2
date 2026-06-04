@@ -1,7 +1,7 @@
 import spotlightSvg from "../../assets/logos/highlight-artist-spotlight.svg";
 import spotlightUnderlineSvg from "../../assets/logos/highlight-artist-spotlight-underline.svg";
-import artistImg from "../../assets/images/highlight-artist.png";
-import shibaImg from "../../assets/images/highlight-shiba.png";
+import artistImg from "../../assets/images/starchaser_highlight.jpg";
+import shibaImg from "../../assets/images/theundefining.jpg";
 
 const Highlight = () => {
   return (
@@ -22,7 +22,7 @@ const Highlight = () => {
 
           {/* 2. Subtitle */}
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 text-center w-full mt-10">
-            The Mosaic SHIBA
+            Theundefined
           </h2>
 
           {/* 3. Testimonial Box */}
@@ -34,11 +34,11 @@ const Highlight = () => {
             />
 
             <p className="text-base lg:text-2xl font-medium leading-loose pl-8 text-[#26215C]">
-              "ทุกลายเส้นและช่องสีคือจังหวะหัวใจที่ฉันตั้งใจ วางลงไปทีละชิ้น
-              เพื่อประกอบความสุขที่จับต้องได้ ส่งตรงจากมือฉันถึงคุณ"
+              "มนุษย์เราใช้ชีวิตเต้นระบำกับความสุขตรงหน้า
+              เลยไม่รู้เลยว่ามีอะไรบางอย่างหัวเราะเค้าอยู่"
             </p>
             <p className="text-right text-[#393276] text-6xl font-['Arizonia',cursive] mt-4 pr-4">
-              Aurelia
+              Starchaser
             </p>
           </div>
 
