@@ -15,10 +15,10 @@ export default function CartTable({ cartItems, updateQuantity, removeItem }) {
         {cartItems.map(item => {
           const product = item;
           const itemId = item._id || item.id;
-          const pId = item.productId;
+          const pId = item.productId?._id || item.productId;
 
           return (
-            <div key={itemId} className="grid grid-cols-12 items-center border-b border-purple-200 pb-6">
+            <div key={itemId || pId} className="grid grid-cols-12 items-center border-b border-purple-200 pb-6">
               {/* Product Info */}
               <div className="col-span-6 flex gap-5">
                 

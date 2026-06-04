@@ -5,6 +5,7 @@ export default function CheckoutSummary({
   cartItems, 
   subtotal, 
   hasAddress, 
+  address,
   paymentMethod,
   onCreateOrder,
   loading,
@@ -13,15 +14,28 @@ export default function CheckoutSummary({
   const navigate = useNavigate();
 
   const handleCheckout = async () => {
-    if (!hasAddress) {
+    if (!hasAddress || !address) {
       alert("กรุณาระบุที่อยู่สำหรับจัดส่ง");
       return;
     }
 
+    if (!paymentMethod) {
+      alert("กรุณาเลือกช่องทางการชำระเงินก่อนดำเนินการต่อค่ะ");
+      return;
+    }
+
     try {
-      // 1. API: POST /api/orders/checkout - สร้างคำสั่งซื้อจริง (ไม่ต้องส่ง addressId แล้ว)
+      // 1. API: POST /api/orders/checkout - สร้างคำสั่งซื้อจริง
       const orderData = await onCreateOrder({
-        paymentMethod: paymentMethod.toLowerCase() 
+        paymentMethod: paymentMethod, // ส่งค่าที่เป็น lowercase ตามมาตรฐาน (promptpay)
+        shippingAddress: {
+          recipientName: address.recipientName,
+          phone: address.phone,
+          street: address.street,
+          district: address.district || "",
+          province: address.province,
+          postcode: address.postcode
+        }
       });
 
       if (orderData) {

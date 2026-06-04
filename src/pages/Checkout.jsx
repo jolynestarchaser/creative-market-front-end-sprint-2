@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import CheckoutHeader from "../components/Checkout/01_CheckoutHeader";
 import CheckoutForm from "../components/Checkout/02_CheckoutForm";
 import CheckoutSummary from "../components/Checkout/03_CheckoutSummary";
@@ -6,6 +8,7 @@ import { useCart } from "../context/CartContext";
 import useCheckoutActions from "../components/Checkout/useCheckoutActions";
 
 export default function Checkout() {
+  const navigate = useNavigate();
   const { cartItems, loadingCart } = useCart();
   const { 
     addresses, 
@@ -16,7 +19,7 @@ export default function Checkout() {
     loading: loadingActions 
   } = useCheckoutActions();
   
-  const [paymentMethod, setPaymentMethod] = useState("Promptpay");
+  const [paymentMethod, setPaymentMethod] = useState("");
 
   useEffect(() => {
     fetchAddresses();
@@ -57,6 +60,7 @@ export default function Checkout() {
               cartItems={cartItems}
               subtotal={subtotal}
               hasAddress={addresses.length > 0}
+              address={addresses.length > 0 ? addresses[0] : null}
               paymentMethod={paymentMethod}
               onCreateOrder={createOrder}
               loading={loadingActions}

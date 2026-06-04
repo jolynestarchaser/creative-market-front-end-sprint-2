@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { ShoppingCart, User, Truck } from "lucide-react";
 
 export default function Complete() {
   const navigate = useNavigate();
@@ -8,13 +9,13 @@ export default function Complete() {
       <div className="text-center mb-30">
         <h1 className="text-3xl font-bold mb-3 text-[#393276]">Complete</h1>
         <div className="flex items-center justify-center gap-3 text-sm text-[#4C1D95]">
-          <span className="material-icons text-xl">shopping_cart</span>
+          <ShoppingCart size={20} />
           <div className="w-12 h-[2px] bg-[#4C1D95]"></div>
           <div className="w-2 h-2 rounded-full bg-[#4C1D95]"></div>
           <div className="w-12 h-[2px] bg-[#4C1D95]"></div>
           <div className="w-2 h-2 rounded-full bg-[#4C1D95]"></div>
           <div className="w-12 h-[2px] bg-[#4C1D95]"></div>
-          <span className="material-icons text-[#4C1D95] text-xl">person</span>
+          <User size={20} />
         </div>
       </div>
 
@@ -30,9 +31,7 @@ export default function Complete() {
 
         {/* ไอคอนรถบรรทุก */}
         <div className="flex justify-center">
-          <span className="material-icons text-5xl text-[#1E1B4B]">
-            local_shipping
-          </span>
+          <Truck size={48} className="text-[#1E1B4B]" />
         </div>
 
         <p className="text-sm text-purple-400">wait for artist shipping</p>

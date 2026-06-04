@@ -183,18 +183,40 @@ export default function CheckoutForm({
 
       <div className="border border-[#4C1D95] rounded-lg p-5 bg-white/50">
         <h3 className="font-bold mb-4 text-[#1E1B4B]">เลือกวิธีชำระเงิน</h3>
-        <div className="space-y-4">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="radio"
-              name="payment"
-              value="promptpay"
-              checked={paymentMethod === "promptpay"}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="accent-[#4C1D95]"
-            />
-            <span className="text-sm font-medium">Promptpay (พร้อมเพย์)</span>
-          </label>
+        <div className="space-y-3">
+          {/* PromptPay - Active Selection */}
+          <div 
+            onClick={() => setPaymentMethod("promptpay")}
+            className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all ${
+              paymentMethod === "promptpay" 
+                ? "border-[#4C1D95] bg-purple-50 shadow-sm" 
+                : "border-gray-200 bg-white/50 hover:border-purple-200"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                paymentMethod === "promptpay" ? "border-[#4C1D95]" : "border-gray-300"
+              }`}>
+                {paymentMethod === "promptpay" && <div className="w-2 h-2 rounded-full bg-[#4C1D95]"></div>}
+              </div>
+              <div>
+                <span className="text-sm font-bold text-[#1E1B4B]">Promptpay (พร้อมเพย์)</span>
+                <p className="text-[10px] text-gray-400 font-medium">สแกน QR Code เพื่อชำระเงินทันที</p>
+              </div>
+            </div>
+            <div className="bg-[#00427a] px-2 py-1 rounded text-[8px] text-white font-bold tracking-wider">PROMPTPAY</div>
+          </div>
+
+          {/* Placeholder: Credit Card */}
+          <div className="flex items-center justify-between p-4 rounded-lg border-2 border-dashed border-gray-200 bg-gray-50/30 opacity-60 cursor-not-allowed">
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 rounded-full border-2 border-gray-200"></div>
+              <div>
+                <span className="text-sm font-bold text-gray-400">Credit / Debit Card</span>
+                <p className="text-[10px] text-gray-300 font-medium">เร็วๆ นี้ (Coming Soon)</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
