@@ -16,57 +16,28 @@ const formatCurrency = (value) =>
     maximumFractionDigits: 2,
   }).format(value || 0);
 
-const groupOrdersByOrderId = (orders) =>
-  Object.values(
-    orders.reduce((acc, item) => {
-      if (!acc[item.orderId]) {
-        acc[item.orderId] = {
-          id: item.orderId,
-          orderId: item.orderId,
-          status: item.status,
-          statusLabel: item.statusLabel,
-          createdAt: item.createdAt,
-          courier: item.courier || "",
-          trackingNumber: item.trackingNumber || "",
-          items: [],
-          totalAmount: 0,
-          totalQuantity: 0,
-        };
-      }
-
-      acc[item.orderId].items.push(item);
-      acc[item.orderId].totalAmount += item.lineTotal || item.price * item.quantity;
-      acc[item.orderId].totalQuantity += item.quantity || 0;
-
-      return acc;
-    }, {}),
-  ).map((group) => ({
-    ...group,
-    primaryItem: group.items[0],
-    extraItems: group.items.slice(1),
-  }));
-
 const MyOrders = ({ orders, summary, loading, error }) => {
   const [activeTab, setActiveTab] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const groupedOrders = groupOrdersByOrderId(orders);
-
   const filteredOrders =
     activeTab === "All"
-      ? groupedOrders
-      : groupedOrders.filter((order) => order.status === activeTab);
+      ? orders
+      : orders.filter((order) => order.status === activeTab);
 
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+  const safeTotalPages = Math.max(totalPages, 1);
+  const visiblePage = Math.min(currentPage, safeTotalPages);
+
   const paginatedOrders = filteredOrders.slice(
-    (currentPage - 1) * ordersPerPage,
-    currentPage * ordersPerPage,
+    (visiblePage - 1) * ordersPerPage,
+    visiblePage * ordersPerPage,
   );
 
   const orderStats = [
     { label: "Total orders", value: String(summary.totalOrders) },
     { label: "Total spend", value: `฿${formatCurrency(summary.totalSpend)}` },
-    { label: "Completed", value: String(summary.completedOrders) },
+    { label: "Orders Complete", value: String(summary.completedOrders) },
   ];
 
   if (loading) {
@@ -145,15 +116,15 @@ const MyOrders = ({ orders, summary, loading, error }) => {
           <button
             type="button"
             onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
-            disabled={currentPage === 1}
+            disabled={visiblePage === 1}
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             &lt;
           </button>
 
-          {Array.from({ length: totalPages }, (_, index) => {
+          {Array.from({ length: safeTotalPages }, (_, index) => {
             const page = index + 1;
-            const isActive = currentPage === page;
+            const isActive = visiblePage === page;
 
             return (
               <button
@@ -174,9 +145,9 @@ const MyOrders = ({ orders, summary, loading, error }) => {
           <button
             type="button"
             onClick={() =>
-              setCurrentPage((page) => Math.min(page + 1, totalPages))
+              setCurrentPage((page) => Math.min(page + 1, safeTotalPages))
             }
-            disabled={currentPage === totalPages}
+            disabled={visiblePage === safeTotalPages}
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             &gt;

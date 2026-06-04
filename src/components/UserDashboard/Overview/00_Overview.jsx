@@ -19,7 +19,9 @@ const Overview = ({
   onOpenOrders,
 }) => {
   if (loading) {
-    return <section className="text-sm text-gray-500">Loading dashboard...</section>;
+    return (
+      <section className="text-sm text-gray-500">Loading dashboard...</section>
+    );
   }
 
   if (error) {
@@ -32,6 +34,9 @@ const Overview = ({
         <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
           Overview
         </h1>
+        <p className="mt-1 text-sm text-gray-400">
+          ข้อมูลสรุปเกี่ยวกับบัญชีและคำสั่งซื้อของคุณ
+        </p>
       </header>
 
       <div className="grid gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-[1.4fr_0.8fr_0.8fr]">

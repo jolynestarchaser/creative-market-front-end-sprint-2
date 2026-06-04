@@ -18,7 +18,12 @@ const formatAmount = (value) =>
 
 const OrderCard = ({ order }) => {
   const [expanded, setExpanded] = useState(false);
-  const primaryItem = order.primaryItem;
+  const primaryItem = order.items[0];
+  const extraItems = order.items.slice(1);
+
+  if (!primaryItem) {
+    return null;
+  }
 
   const renderOrderItem = (item, isPrimary = false) => (
     <div
@@ -50,7 +55,7 @@ const OrderCard = ({ order }) => {
         </p>
         <p className="mt-3 text-sm text-gray-400">{item.quantity} item(s)</p>
 
-        {isPrimary && order.extraItems.length > 0 && (
+        {isPrimary && extraItems.length > 0 && (
           <button
             type="button"
             onClick={() => setExpanded((value) => !value)}
@@ -58,29 +63,12 @@ const OrderCard = ({ order }) => {
           >
             {expanded
               ? "Hide additional items"
-              : `View ${order.extraItems.length} more item(s)`}
+              : `View ${extraItems.length} more item(s)`}
           </button>
-        )}
-
-        {isPrimary && (
-          <div className="mt-3 space-y-1 text-sm text-gray-500">
-            <p>
-              Courier:{" "}
-              <span className="font-medium text-gray-800">
-                {order.courier || "-"}
-              </span>
-            </p>
-            <p>
-              Tracking Number:{" "}
-              <span className="font-medium text-gray-800">
-                {order.trackingNumber || "-"}
-              </span>
-            </p>
-          </div>
         )}
       </div>
 
-      <div className="grid shrink-0 gap-4 text-sm text-gray-500 md:min-w-105 md:grid-cols-4">
+      <div className="grid shrink-0 gap-4 text-sm text-gray-500 md:min-w-105 md:grid-cols-4 lg:w-[760px] lg:grid-cols-[140px_100px_120px_110px_190px]">
         <div>
           <p
             className={`text-xs uppercase tracking-[0.2em] text-gray-400 ${
@@ -137,6 +125,33 @@ const OrderCard = ({ order }) => {
             {order.statusLabel}
           </span>
         </div>
+        <div className="min-w-0">
+          <p
+            className={`text-xs uppercase tracking-[0.2em] text-gray-400 ${
+              isPrimary ? "" : "invisible"
+            }`}
+          >
+            Shipping Info
+          </p>
+          <div
+            className={`mt-1 space-y-1 text-sm text-gray-500 ${
+              isPrimary ? "" : "invisible"
+            }`}
+          >
+            <p className="break-words">
+              Courier:{" "}
+              <span className="font-medium text-gray-800">
+                {order.courier || "-"}
+              </span>
+            </p>
+            <p className="break-words">
+              Tracking Number:{" "}
+              <span className="font-medium text-gray-800">
+                {order.trackingNumber || "-"}
+              </span>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -145,7 +160,7 @@ const OrderCard = ({ order }) => {
     <article className="rounded-2xl bg-white p-5 md:p-6">
       {renderOrderItem(primaryItem, true)}
 
-      {order.extraItems.length > 0 && (
+      {extraItems.length > 0 && (
         <div
           className={`overflow-hidden border-t border-gray-100 transition-all duration-300 ease-out ${
             expanded
@@ -154,7 +169,7 @@ const OrderCard = ({ order }) => {
           }`}
         >
           <div className="space-y-3">
-            {order.extraItems.map((item) => renderOrderItem(item))}
+            {extraItems.map((item) => renderOrderItem(item))}
           </div>
         </div>
       )}
