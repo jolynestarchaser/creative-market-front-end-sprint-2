@@ -6,6 +6,7 @@ const ProductGallery = ({ images = [product1], audioSrc }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
+  const modalScrollRef = useRef(null);
 
   const hasAudio = Boolean(audioSrc);
 
@@ -55,6 +56,14 @@ const ProductGallery = ({ images = [product1], audioSrc }) => {
     }
   };
 
+  const handleModalWheel = (event) => {
+    event.stopPropagation();
+
+    if (modalScrollRef.current) {
+      modalScrollRef.current.scrollTop += event.deltaY;
+    }
+  };
+
   return (
     <section className="w-full">
       <div className="relative overflow-hidden border border-[#6b648b] bg-white">
@@ -100,26 +109,30 @@ const ProductGallery = ({ images = [product1], audioSrc }) => {
       </div>
 
       {!hasAudio && isOpen && (
-        <div
-          className="fixed inset-0 z-50 overflow-y-scroll overscroll-contain bg-black/70 px-4 py-8"
-          onClick={() => setIsOpen(false)}
-        >
+        <div className="fixed inset-0 z-50 bg-black/70">
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="fixed right-6 top-6 z-10 rounded-full bg-white px-3 py-1 text-xl font-bold text-[#393276] shadow"
+            className="fixed right-6 top-6 z-20 rounded-full bg-white px-3 py-1 text-xl font-bold text-[#393276] shadow"
             aria-label="Close larger product image"
           >
             ×
           </button>
 
-          <div className="mx-auto flex min-h-screen w-full justify-center">
-            <img
-              src={mainImage}
-              alt="Product enlarged"
-              className="block h-auto w-full max-w-5xl rounded-lg bg-white object-contain shadow-2xl"
-              onClick={(event) => event.stopPropagation()}
-            />
+          <div
+            ref={modalScrollRef}
+            className="fixed inset-0 z-10 h-screen overflow-y-auto overscroll-contain px-4 py-8"
+            onClick={() => setIsOpen(false)}
+            onWheel={handleModalWheel}
+          >
+            <div className="mx-auto flex w-full justify-center">
+              <img
+                src={mainImage}
+                alt="Product enlarged"
+                className="block h-auto w-full max-w-5xl rounded-lg bg-white object-contain shadow-2xl"
+                onClick={(event) => event.stopPropagation()}
+              />
+            </div>
           </div>
         </div>
       )}
