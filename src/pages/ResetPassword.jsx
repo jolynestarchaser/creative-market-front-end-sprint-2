@@ -11,9 +11,9 @@ import logoLogin from "../assets/icons/creative-logo.svg";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
+  // ดึง Token จาก URL (เช่น /reset-password/abc1234)
   const { token } = useParams();
 
-  const [tokenInput, setTokenInput] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -22,13 +22,6 @@ const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [blockEndTime, setBlockEndTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
-
-  // ดึง Token จาก URL มาใส่ในช่อง Input อัตโนมัติ (ถ้ามี)
-  useEffect(() => {
-    if (token) {
-      setTokenInput(token);
-    }
-  }, [token]);
 
   // เช็คสถานะ Auth
   useEffect(() => {
@@ -47,7 +40,7 @@ const ResetPassword = () => {
           }
         }
       } catch (err) {
-        console.error(err);
+        console.error("Auth check failed:", err);
       }
     };
     checkAuth();
@@ -84,7 +77,7 @@ const ResetPassword = () => {
           setTimeLeft(data.timeLeft);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Rate limit check failed:", error);
       }
     };
     checkRateLimitStatus();
@@ -122,7 +115,12 @@ const ResetPassword = () => {
     setErrors({});
     let newErrors = {};
 
-    if (!tokenInput.trim()) newErrors.token = "PLEASE PROVIDE A RESET TOKEN";
+    // ถ้าไม่มี Token จาก URL (ไม่ได้กดมาจากอีเมล) ให้โชว์ Error
+    if (!token) {
+      setErrors({ global: "ไม่พบ Token สำหรับรีเซ็ตรหัสผ่าน กรุณากดลิงก์จากอีเมลใหม่อีกครั้ง" });
+      return;
+    }
+
     if (!newPassword) newErrors.newPassword = "PASSWORD CANNOT BE EMPTY";
     else if (newPassword.length < 6)
       newErrors.newPassword = "PASSWORD MUST BE AT LEAST 6 CHARACTERS";
@@ -135,7 +133,7 @@ const ResetPassword = () => {
     }
 
     setIsLoading(true);
-    // Delay 2 วินาที ตามที่กำหนดไว้
+    // Delay 2 วินาที
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     try {
@@ -148,7 +146,7 @@ const ResetPassword = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          token: tokenInput,
+          token: token, // ส่ง Token ที่ได้จาก URL ตรงๆ ได้เลย
           password: newPassword,
         }),
       });
@@ -167,7 +165,6 @@ const ResetPassword = () => {
       setIsSuccess(true);
     } catch (err) {
       console.error("Reset Password Error:", err);
-      // โชว์ Global Error กรณี Token หมดอายุ หรือมีปัญหาอื่นๆ
       setErrors({ global: err.message || 'ลิงก์นี้หมดอายุหรือถูกใช้งานไปแล้ว กรุณาทำรายการขอลืมรหัสผ่านใหม่อีกครั้ง' });
     } finally {
       setIsLoading(false);
@@ -203,11 +200,11 @@ const ResetPassword = () => {
         
         <form onSubmit={handleResetPassword} className="space-y-4 text-left relative z-20">
           
-          {/* ป้ายเตือน Global Error จากฝั่งเพื่อน */}
+          {/* ป้ายเตือน Global Error */}
           {errors.global && (
             <div className="bg-red-500/20 border border-red-500/50 text-[#ffebed] px-4 py-3 rounded-xl text-[14px] text-center font-medium shadow-sm animate-pulse leading-relaxed mb-4">
               {errors.global}
-              {(errors.global.includes('หมดอายุ') || errors.global.includes('ไม่ถูกต้อง')) && (
+              {(errors.global.includes('หมดอายุ') || errors.global.includes('ไม่ถูกต้อง') || errors.global.includes('ไม่พบ Token')) && (
                 <span className="block mt-2">
                   กรุณาทำการขอเปลี่ยนรหัสผ่านใหม่{" "}
                   <Link 
@@ -221,28 +218,7 @@ const ResetPassword = () => {
             </div>
           )}
 
-          {/* Token Input (ผสานดีไซน์แคปซูลของเพื่อน) */}
-          <div className={`relative transition-all duration-300 ${errors.token ? 'pb-5' : 'pb-0'}`}>
-            <label className="block text-white text-[15px] font-medium mb-1 pl-4 opacity-90">Reset Token</label>
-            <input 
-              type="text" 
-              placeholder="Paste your token here.." 
-              disabled={isLoading || blockEndTime !== null}
-              className={`w-full px-6 py-3 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg ${errors.token ? 'border-red-500' : 'border-white'} ${isLoading || blockEndTime !== null ? 'opacity-50 cursor-not-allowed' : ''}`}
-              value={tokenInput} 
-              onChange={(e) => {
-                setTokenInput(e.target.value);
-                if (errors.token) setErrors({ ...errors, token: "" });
-              }}
-            />
-            {errors.token && (
-              <p className="absolute left-1/2 -translate-x-1/2 -bottom-1 z-20 px-3 py-0 text-[14px] font-bold text-red-600 bg-white rounded-md border border-red-200 shadow-sm whitespace-nowrap">
-                {errors.token}
-              </p>
-            )}
-          </div>
-
-          {/* New Password Input (ดีไซน์แคปซูลของเพื่อน) */}
+          {/* New Password Input */}
           <div className={`relative transition-all duration-300 ${errors.newPassword ? 'pb-5' : 'pb-0'}`}>
             <label className="block text-white text-[15px] font-medium mb-1 pl-4 opacity-90">New Password</label>
             <input 
@@ -263,7 +239,7 @@ const ResetPassword = () => {
             )}
           </div>
 
-          {/* Confirm Password Input (ดีไซน์แคปซูลของเพื่อน) */}
+          {/* Confirm Password Input */}
           <div className={`relative transition-all duration-300 ${errors.confirmPassword ? 'pb-5' : 'pb-0'}`}>
             <label className="block text-white text-[15px] font-medium mb-1 pl-4 opacity-90">Confirm Password</label>
             <input 
@@ -317,7 +293,6 @@ const ResetPassword = () => {
         </div>
       </div>
 
-      {/* ใช้งาน SuccessModal */}
       <SuccessModal
         isOpen={isSuccess}
         onClose={() => {

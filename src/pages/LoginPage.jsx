@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 // --- Import SuccessModal ---
-import SuccessModal from "../components/Global/SuccessModal"; // ปรับ Path ให้ตรงกับโปรเจกต์คุณ
+import SuccessModal from "../components/Global/SuccessModal"; 
 
 // --- Import รูปภาพ ---
 import bgDesktop from "../assets/images/j-login-bg.jpg";
