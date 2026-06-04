@@ -105,15 +105,16 @@ const Orders = ({ summary, orders, loading, error }) => {
             <thead className="border-b border-gray-100 bg-gray-50">
               <tr className="text-[10px] uppercase tracking-[0.2em] text-gray-400">
                 <th className="px-4 py-4 font-semibold md:px-6">Product</th>
-                <th className="px-4 py-4 font-semibold">Date</th>
-                <th className="px-4 py-4 font-semibold">Qty</th>
-                <th className="px-4 py-4 font-semibold">Customer</th>
-                <th className="px-4 py-4 text-right font-semibold">Amount</th>
-                <th className="px-4 py-4 font-semibold">Status</th>
-                <th className="px-4 py-4 font-semibold">Courier</th>
-                <th className="px-4 py-4 font-semibold md:px-6">
+                <th className="px-4 py-4 text-center font-semibold">Payment Date</th>
+                <th className="px-4 py-4 text-center font-semibold">Price</th>
+                <th className="px-4 py-4 text-center font-semibold">Customer</th>
+                <th className="px-4 py-4 text-center font-semibold">Amount</th>
+                <th className="px-4 py-4 text-center font-semibold">Status</th>
+                <th className="px-4 py-4 text-center font-semibold">Courier</th>
+                <th className="px-4 py-4 text-center font-semibold md:px-6">
                   Tracking Number
                 </th>
+                <th className="px-4 py-4 text-center font-semibold md:px-6" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -124,7 +125,7 @@ const Orders = ({ summary, orders, loading, error }) => {
               ) : (
                 <tr>
                   <td
-                    colSpan="8"
+                    colSpan="9"
                     className="px-4 py-6 text-center text-sm text-gray-400 md:px-6"
                   >
                     No orders found for this filter.
@@ -140,31 +141,35 @@ const Orders = ({ summary, orders, loading, error }) => {
         <div className="flex items-center justify-center gap-2 pt-2">
           <button
             type="button"
-            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
             disabled={visiblePage === 1}
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
             &lt;
           </button>
 
-          {Array.from({ length: safeTotalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              type="button"
-              onClick={() => setCurrentPage(page)}
-              className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm font-medium transition ${
-                visiblePage === page
-                  ? "bg-[#8df0a9] text-gray-900"
-                  : "bg-white text-gray-700 hover:bg-gray-100"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
+          {Array.from({ length: safeTotalPages }, (_, index) => index + 1).map(
+            (page) => (
+              <button
+                key={page}
+                type="button"
+                onClick={() => setCurrentPage(page)}
+                className={`flex h-9 w-9 items-center justify-center rounded-xl text-sm font-medium transition ${
+                  visiblePage === page
+                    ? "bg-[#8df0a9] text-gray-900"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                {page}
+              </button>
+            ),
+          )}
 
           <button
             type="button"
-            onClick={() => setCurrentPage((p) => Math.min(p + 1, safeTotalPages))}
+            onClick={() =>
+              setCurrentPage((page) => Math.min(page + 1, safeTotalPages))
+            }
             disabled={visiblePage === safeTotalPages}
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
           >
