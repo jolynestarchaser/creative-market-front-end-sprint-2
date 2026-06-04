@@ -39,7 +39,6 @@ export default function Cart() {
     await removeItem(pId);
   };
 
-
   const subtotal = cartItems.reduce(
     (acc, item) =>
       acc + (item.price || item.productId?.price || 0) * item.quantity,
@@ -56,7 +55,7 @@ export default function Cart() {
 
   return (
     <div className="pt-5 min-h-screen flex flex-col bg-[#F3EFFF]">
-      <main className=" flex-grow max-w-5xl w-full  mx-auto p-6">
+      <main className=" grow max-w-5xl w-full  mx-auto p-6">
         <CartHeader />
 
         <div className="mt-15">

@@ -71,7 +71,9 @@ const OrderCard = ({ order }) => {
       <div className="min-w-0 flex-1">
         <h3 className="text-lg font-bold text-gray-900">{item.name}</h3>
         <p className="mt-1 text-sm text-gray-500">
-          {item.artist !== "-" ? `by ${item.artist}` : `Order #${order.orderId}`}
+          {item.artist !== "-"
+            ? `by ${item.artist}`
+            : `Order #${order.orderId}`}
         </p>
         <p className="mt-3 text-sm text-gray-400">{item.quantity} item(s)</p>
 
@@ -88,7 +90,7 @@ const OrderCard = ({ order }) => {
         ) : null}
       </div>
 
-      <div className="grid shrink-0 gap-4 text-sm text-gray-500 md:min-w-105 md:grid-cols-4 lg:w-[760px] lg:grid-cols-[140px_100px_120px_110px_190px]">
+      <div className="grid shrink-0 gap-4 text-sm text-gray-500 md:min-w-105 md:grid-cols-4 lg:w-190 lg:grid-cols-[140px_100px_120px_110px_190px]">
         <div>
           <p
             className={`text-[10px] uppercase tracking-[0.18em] text-gray-400 ${
@@ -97,11 +99,7 @@ const OrderCard = ({ order }) => {
           >
             {dateMeta.label}
           </p>
-          <p
-            className={`mt-1 text-gray-900 ${
-              isPrimary ? "" : "invisible"
-            }`}
-          >
+          <p className={`mt-1 text-gray-900 ${isPrimary ? "" : "invisible"}`}>
             {formatDate(dateMeta.value)}
           </p>
         </div>
@@ -109,9 +107,7 @@ const OrderCard = ({ order }) => {
           <p className="text-[10px] uppercase tracking-[0.18em] text-gray-400">
             Price
           </p>
-          <p className="mt-1 text-gray-900">
-            {formatAmount(item.price)}
-          </p>
+          <p className="mt-1 text-gray-900">{formatAmount(item.price)}</p>
         </div>
         <div>
           <p
@@ -158,13 +154,13 @@ const OrderCard = ({ order }) => {
               isPrimary ? "" : "invisible"
             }`}
           >
-            <p className="break-words">
+            <p className="wrap-break-words">
               Courier:{" "}
               <span className="font-medium text-gray-800">
                 {order.courier || "-"}
               </span>
             </p>
-            <p className="break-words">
+            <p className="wrap-break-words">
               Tracking Number:{" "}
               <span className="font-medium text-gray-800">
                 {order.trackingNumber || "-"}

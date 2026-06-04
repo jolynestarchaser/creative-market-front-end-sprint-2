@@ -39,7 +39,9 @@ const renderProductImage = (item) =>
 const OrderRow = ({ order }) => {
   const [expanded, setExpanded] = useState(false);
   const [courier, setCourier] = useState(order.courier || "");
-  const [trackingNumber, setTrackingNumber] = useState(order.trackingNumber || "");
+  const [trackingNumber, setTrackingNumber] = useState(
+    order.trackingNumber || "",
+  );
   const [isEditing, setIsEditing] = useState(
     !order.courier && !order.trackingNumber,
   );
@@ -107,8 +109,12 @@ const OrderRow = ({ order }) => {
           <div className="flex items-center gap-3">
             {renderProductImage(primaryItem)}
             <div>
-              <p className="text-sm font-medium text-gray-800">{primaryItem.name}</p>
-              <p className="mt-1 text-xs text-gray-500">by {primaryItem.artist}</p>
+              <p className="text-sm font-medium text-gray-800">
+                {primaryItem.name}
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                by {primaryItem.artist}
+              </p>
               <p className="mt-2 text-sm text-gray-400">
                 {primaryItem.quantity} item(s)
               </p>
@@ -127,7 +133,9 @@ const OrderRow = ({ order }) => {
           </div>
         </td>
         <td className="px-4 py-4 text-center text-sm text-gray-400">
-          {order.status === "paid" && order.paidAt ? formatDate(order.paidAt) : ""}
+          {order.status === "paid" && order.paidAt
+            ? formatDate(order.paidAt)
+            : ""}
         </td>
         <td className="px-4 py-4 text-center text-sm font-medium text-gray-700">
           {formatAmount(primaryItem.price)}
@@ -147,7 +155,7 @@ const OrderRow = ({ order }) => {
         </td>
         <td className="px-4 py-4">
           {canEditShipping ? (
-            <div className="mx-auto min-w-[180px] max-w-[180px] text-center">
+            <div className="mx-auto min-w-45 max-w-45 text-center">
               {isEditing ? (
                 <select
                   value={courier}
@@ -169,7 +177,7 @@ const OrderRow = ({ order }) => {
         </td>
         <td className="px-4 py-4 md:px-6">
           {canEditShipping ? (
-            <div className="mx-auto min-w-[220px] max-w-[220px] text-center">
+            <div className="mx-auto min-w-55 max-w-55 text-center">
               <input
                 type="text"
                 value={trackingNumber}
@@ -183,7 +191,7 @@ const OrderRow = ({ order }) => {
         </td>
         <td className="px-4 py-4 md:px-6">
           {canEditShipping ? (
-            <div className="mx-auto flex min-w-[96px] max-w-[96px] flex-col items-center gap-2">
+            <div className="mx-auto flex min-w-24 max-w-24 flex-col items-center gap-2">
               <button
                 type="button"
                 onClick={() => {
@@ -203,7 +211,9 @@ const OrderRow = ({ order }) => {
               {message ? (
                 <span
                   className={`text-center text-xs ${
-                    messageType === "success" ? "text-emerald-600" : "text-rose-500"
+                    messageType === "success"
+                      ? "text-emerald-600"
+                      : "text-rose-500"
                   }`}
                 >
                   {message}
@@ -227,7 +237,9 @@ const OrderRow = ({ order }) => {
               <div>
                 <p className="text-sm font-medium text-gray-800">{item.name}</p>
                 <p className="mt-1 text-xs text-gray-500">by {item.artist}</p>
-                <p className="mt-2 text-sm text-gray-400">{item.quantity} item(s)</p>
+                <p className="mt-2 text-sm text-gray-400">
+                  {item.quantity} item(s)
+                </p>
               </div>
             </div>
           </td>
