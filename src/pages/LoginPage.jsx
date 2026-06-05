@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 // --- Import SuccessModal ---
-import SuccessModal from "../components/Global/SuccessModal"; // ปรับ Path ให้ตรงกับโปรเจกต์คุณ
+import SuccessModal from "../components/Global/SuccessModal"; 
 
 // --- Import รูปภาพ ---
 import bgDesktop from "../assets/images/j-login-bg.jpg";
@@ -18,6 +18,58 @@ const LoginPage = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [errors, setErrors] = useState({});
   const [isSuccess, setIsSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [isDelaying, setIsDelaying] = useState(false);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const response = await fetch(`${apiBaseUrl}/api/auth/status`);
+        const data = await response.json();
+        if (data.timeLeft > 0) setCountdown(Math.floor(data.timeLeft));
+      } catch (err) {
+        console.error("Status Check Error:", err);
+      }
+    };
+    checkStatus();
+  }, []);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((c) => (c > 0 ? c - 1 : 0));
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown]);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
+          method: "GET",
+          credentials: "include"
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.user && data.user.role === "user") {
+            navigate("/");
+          }
+        }
+      } catch (err) {
+        console.error("Auth Check Error:", err);
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   useEffect(() => {
     // 1. สั่งหยุด Lenis ทันทีที่เข้าหน้านี้
@@ -39,7 +91,10 @@ const LoginPage = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    if (e) e.preventDefault();
+    if (countdown > 0 || isDelaying) return;
+
     let newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -48,7 +103,6 @@ const LoginPage = () => {
     } else if (!emailRegex.test(email)) {
       newErrors.email = "INVALID EMAIL FORMAT (e.g. name@mail.com)";
     }
-
     if (!password) {
       newErrors.password = "PLEASE ENTER YOUR PASSWORD";
     }
@@ -58,9 +112,12 @@ const LoginPage = () => {
       return;
     }
 
+    setIsDelaying(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setIsDelaying(false);
+
     try {
-      const apiBaseUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:7777";
+      const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
       const apiUrl = `${apiBaseUrl}/api/auth/login`;
 
       const response = await fetch(apiUrl, {
@@ -74,7 +131,10 @@ const LoginPage = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.status === 429) {
+        setCountdown(Math.floor(data.timeLeft || 180));
+        setErrors({ password: data.message || "Too many attempts, please wait." });
+      } else if (response.ok) {
         setErrors({});
         setIsLoggedIn(true);
         setUserRole(data.role);
@@ -99,30 +159,23 @@ const LoginPage = () => {
         }}
       />
 
-      <div className="flex flex-col justify-center relative z-10 w-full max-w-[540px] md:max-w-[648px] min-h-[600px] md:min-h-[709px] p-8 md:p-10 text-center bg-black/30 backdrop-blur-md border border-white/20 shadow-2xl mx-4 scale-80">
+      <div className="flex flex-col justify-center relative z-10 w-full max-w-[540px] md:max-w-[648px] min-h-[600px] md:min-h-[709px] p-8 md:p-10 text-center bg-black/30 backdrop-blur-md border border-white/20 shadow-2xl mx-4 scale-[0.8]">
         <div className="mb-6 md:mb-8 flex justify-center">
-          <img
-            src={logoLogin}
-            alt="Logo"
-            className="w-[75%] md:w-[85%] h-auto object-contain"
-          />
+          <img src={logoLogin} alt="Logo" className="w-[75%] md:w-[85%] h-auto object-contain" />
         </div>
 
-        <div className="space-y-4 text-left">
-          {/* <label className="block text-white text-xl !md:text-2xl font-medium mb-6  opacity-90">
-            ENTER YOUR EMAIL AND PASSWORD
-          </label> */}
-
+        <form onSubmit={handleLogin} className="space-y-4 text-left">
           {/* Email Input */}
           <div className="flex flex-col">
             <input
               type="email"
               placeholder="Enter your email address"
+              disabled={countdown > 0 || isDelaying}
               className={`w-full px-6 py-3 md:py-3.5 bg-black/30 placeholder-white/80 text-white outline-none focus:ring-1 text-sm shadow-lg border-2 transition-colors duration-300 ${
                 errors.email
                   ? "border-red-500 focus:ring-red-500/50"
                   : "border-white/20 focus:ring-white"
-              }`}
+              } ${countdown > 0 || isDelaying ? "opacity-50 cursor-not-allowed" : ""}`}
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -141,11 +194,12 @@ const LoginPage = () => {
             <input
               type="password"
               placeholder="Enter your password"
+              disabled={countdown > 0 || isDelaying}
               className={`w-full px-6 py-3 md:py-3.5 bg-black/30 placeholder-white/80 text-white outline-none focus:ring-1 text-sm shadow-lg border-2 transition-colors duration-300 ${
                 errors.password
                   ? "border-red-500 focus:ring-red-500/50"
                   : "border-white/20 focus:ring-white"
-              }`}
+              } ${countdown > 0 || isDelaying ? "opacity-50 cursor-not-allowed" : ""}`}
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
@@ -158,14 +212,19 @@ const LoginPage = () => {
               </p>
             )}
           </div>
-        </div>
 
-        <button
-          onClick={handleLogin}
-          className="w-full py-5 mt-6 bg-[#ffffff]   text-black text-xl font-bold shadow-xl transition-all active:scale-95"
-        >
-          LOGIN
-        </button>
+          <button
+            type="submit"
+            disabled={countdown > 0 || isDelaying}
+            className={`w-full py-5 mt-6 text-xl font-bold shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 ${
+              countdown > 0 || isDelaying
+                ? "bg-gray-500 text-white cursor-not-allowed"
+                : "bg-[#ffffff] text-black hover:bg-gray-200"
+            }`}
+          >
+            {isDelaying ? "PROCESSING..." : countdown > 0 ? `WAIT ${formatTime(countdown)}` : "LOGIN"}
+          </button>
+        </form>
 
         <div className="mt-6 text-xs md:text-sm text-white/90 space-y-2">
           <p

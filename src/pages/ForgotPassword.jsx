@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// --- Import SuccessModal (สอดคล้องกับหน้า Login/Register) ---
+// --- Import SuccessModal ---
 import SuccessModal from "../components/Global/SuccessModal";
 
 // --- Import รูปภาพ ---
@@ -15,16 +15,36 @@ const ForgotPassword = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [blockEndTime, setBlockEndTime] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
-    // 1. สั่งหยุด Lenis ทันทีที่เข้าหน้านี้
-    if (window.lenis) window.lenis.stop();
+    const checkAuth = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
+          method: "GET",
+          credentials: "include"
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.user && data.user.role === "user") {
+            navigate("/");
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
-    // 2. ล็อกระดับ CSS body ไม่ให้สกรอลล์สำรองเด้ง (Bouncing)
+  useEffect(() => {
+    if (window.lenis) window.lenis.stop();
     document.body.style.overflow = "hidden";
 
     return () => {
-      // 3. ปลดล็อกคืนค่าให้หน้าอื่นเลื่อนได้ปกติ ตอนย้ายออกจากหน้านี้
       if (window.lenis) window.lenis.start();
       document.body.style.overflow = "unset";
     };
@@ -36,8 +56,53 @@ const ForgotPassword = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  useEffect(() => {
+    const checkRateLimitStatus = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const response = await fetch(`${apiBaseUrl}/api/auth/forgot-password/status`);
+        const data = await response.json();
+
+        if (data.isBlocked) {
+          setBlockEndTime(Date.now() + (data.timeLeft * 1000));
+          setTimeLeft(data.timeLeft);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    checkRateLimitStatus();
+  }, []);
+
+  useEffect(() => {
+    if (!blockEndTime) return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      if (now >= blockEndTime) {
+        setBlockEndTime(null);
+        setTimeLeft(0);
+        setError("");
+        clearInterval(interval);
+      } else {
+        setTimeLeft(Math.ceil((blockEndTime - now) / 1000));
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [blockEndTime]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
   const handleRequestToken = async (e) => {
     e.preventDefault();
+    if (blockEndTime !== null) return;
+
     setError("");
 
     if (!email) {
@@ -48,8 +113,7 @@ const ForgotPassword = () => {
     setIsLoading(true);
 
     try {
-      const apiBaseUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:7777";
+      const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
       const apiUrl = `${apiBaseUrl}/api/auth/forgot-password`;
 
       const response = await fetch(apiUrl, {
@@ -63,10 +127,25 @@ const ForgotPassword = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 429) {
+          const resetTimeStr = response.headers.get("RateLimit-Reset");
+          const retryAfterStr = response.headers.get("Retry-After");
+
+          let waitTimeSeconds = 3 * 60;
+
+          if (resetTimeStr) {
+            waitTimeSeconds = parseInt(resetTimeStr, 10);
+          } else if (retryAfterStr) {
+            waitTimeSeconds = parseInt(retryAfterStr, 10);
+          }
+          
+          setBlockEndTime(Date.now() + (waitTimeSeconds * 1000));
+          setTimeLeft(waitTimeSeconds);
+        }
         throw new Error(data.message || "เกิดข้อผิดพลาดในการส่งข้อมูล");
       }
 
-      setIsSuccess(true); // เปลี่ยนมาเปิด SuccessModal แทนการสลับ UI ในหน้าเดิม
+      setIsSuccess(true);
     } catch (err) {
       console.error("FAILED...", err);
       setError(
@@ -79,7 +158,6 @@ const ForgotPassword = () => {
 
   return (
     <div className="fixed inset-0 h-screen flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat">
-      {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-500"
         style={{
@@ -89,8 +167,7 @@ const ForgotPassword = () => {
         }}
       />
 
-      {/* Main Container - ปรับเป็นสไตล์กระจกเงาเข้ม (bg-black/30 backdrop-blur-md) */}
-      <div className="scale-80 relative z-10 bg-black/30 backdrop-blur-md w-full max-w-[540px] md:max-w-[648px] h-auto p-8 md:p-10 text-center border border-white/20 shadow-2xl mx-4 flex flex-col justify-center">
+      <div className="scale-[0.8] relative z-10 bg-black/30 backdrop-blur-md w-full max-w-[540px] md:max-w-[648px] h-auto p-8 md:p-10 text-center border border-white/20 shadow-2xl mx-4 flex flex-col justify-center">
         <h2 className="!text-[36px] md:!text-[40px] font-bold text-white mb-6">
           FORGOT PASSWORD
         </h2>
@@ -100,22 +177,19 @@ const ForgotPassword = () => {
           your email
         </p>
 
+        {/* --- ส่วนผสม: ดีไซน์ของเพื่อน + โลจิกของพี่ตรี --- */}
         <form onSubmit={handleRequestToken} className="space-y-4 text-left">
-          {/* <label className="block text-white !text-xl font-medium mb-1 pl-4 opacity-90">
+          <label className="block text-white text-lg font-medium mb-1 pl-4 opacity-90 translate-y-7 md:translate-y-3.5">
             Enter your email
-          </label> */}
-
-          {/* Email Input - จัดระเบียบการ Flow ของ Error แบบเดียวกับหน้า Login */}
-          <div className="flex flex-col">
+          </label>
+          <div className={`relative transition-all duration-300 ${error ? "pb-5" : "pb-0"}`}>
             <input
               type="email"
               placeholder="name@mail.com"
-              disabled={isLoading}
-              className={`w-full px-6 py-3 md:py-3.5 bg-black/60 placeholder-white/80 text-white outline-none focus:ring-1 text-sm shadow-lg border-2 transition-colors duration-300 ${
-                error
-                  ? "border-red-500 focus:ring-red-500/50"
-                  : "border-white/20 focus:ring-white"
-              } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={isLoading || blockEndTime !== null}
+              className={`w-full px-6 py-3 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg translate-y-8 md:translate-y-5 ${
+                error ? "border-red-500" : "border-white"
+              } ${isLoading || blockEndTime !== null ? "opacity-50 cursor-not-allowed" : ""}`}
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -123,24 +197,30 @@ const ForgotPassword = () => {
               }}
             />
             {error && (
-              <p className="text-red-400 text-[14px] mt-1.5 pl-4 font-bold tracking-wide">
+              <p className="absolute left-1/2 -translate-x-1/2 -bottom-1 z-20 px-3 py-0 text-[14px] font-bold text-red-600 bg-white rounded-md border border-red-200 shadow-sm whitespace-nowrap translate-y-15 md:translate-y-7.5">
                 {error}
               </p>
             )}
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full py-5 mt-6 bg-[#ffffff]  text-black text-xl font-bold shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+            disabled={isLoading || blockEndTime !== null}
+            className={`w-full py-4 mt-6 text-white text-lg font-bold rounded-full shadow-xl transition-all flex items-center justify-center gap-2 translate-y-7.5 md:translate-y-5 ${
+              blockEndTime !== null 
+                ? "bg-gray-500/80 cursor-not-allowed opacity-90" 
+                : "bg-[#1e1a3d] hover:bg-[#2d2859] hover:brightness-150 active:scale-95"
+            }`}
           >
-            {isLoading ? "กำลังส่งอีเมล..." : "Request Reset Link"}
+            {isLoading 
+              ? "กำลังส่งอีเมล..." 
+              : blockEndTime !== null 
+                ? `กรุณารอ ${formatTime(timeLeft)}` 
+                : "Request Reset Link"}
           </button>
         </form>
 
-        {/* Footer Link */}
-        <div className="mt-6 text-xs md:text-sm text-white/90">
+        <div className="mt-6 text-sm text-white/90 translate-y-5 md:translate-y-2.5">
           <p>
             Remember your password?{" "}
             <span
@@ -153,7 +233,6 @@ const ForgotPassword = () => {
         </div>
       </div>
 
-      {/* เรียกใช้งาน Global SuccessModal เมื่อยิง API กู้คืนรหัสผ่านสำเร็จ */}
       <SuccessModal
         isOpen={isSuccess}
         onClose={() => {

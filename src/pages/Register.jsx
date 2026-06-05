@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 // --- Import SuccessModal (สอดคล้องกับหน้า Login) ---
@@ -16,25 +16,36 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
+
   const [captcha, setCaptcha] = useState({ num1: 0, num2: 0, userAnswer: "" });
   const [errors, setErrors] = useState({});
-
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // ควบคุมสถานะ Loading
+  const [isLoading, setIsLoading] = useState(false);
+  const [blockEndTime, setBlockEndTime] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const generateCaptcha = () => {
-    const n1 = Math.floor(Math.random() * 10) + 1;
-    const n2 = Math.floor(Math.random() * 10) + 1;
-    setCaptcha({ num1: n1, num2: n2, userAnswer: "" });
-  };
+    const checkAuth = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
+          method: "GET",
+          credentials: "include"
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.user && data.user.role === "user") {
+            navigate("/");
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   useEffect(() => {
     // 1. สั่งหยุด Lenis ทันทีที่เข้าหน้านี้
@@ -51,8 +62,64 @@ const Register = () => {
   }, []);
 
   useEffect(() => {
-    generateCaptcha();
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // ใช้ useCallback เพื่อป้องกัน Warning ใน useEffect
+  const generateCaptcha = useCallback(() => {
+    const n1 = Math.floor(Math.random() * 10) + 1;
+    const n2 = Math.floor(Math.random() * 10) + 1;
+    setCaptcha({ num1: n1, num2: n2, userAnswer: "" });
+  }, []);
+
+  useEffect(() => {
+    generateCaptcha();
+  }, [generateCaptcha]);
+
+  useEffect(() => {
+    const checkRateLimitStatus = async () => {
+      try {
+        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const response = await fetch(`${apiBaseUrl}/api/users/register/status`);
+        const data = await response.json();
+
+        if (data.isBlocked) {
+          setBlockEndTime(Date.now() + (data.timeLeft * 1000));
+          setTimeLeft(data.timeLeft);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    checkRateLimitStatus();
+  }, []);
+
+  useEffect(() => {
+    if (!blockEndTime) return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      if (now >= blockEndTime) {
+        setBlockEndTime(null);
+        setTimeLeft(0);
+        setErrors((prev) => ({ ...prev, global: null }));
+        clearInterval(interval);
+      } else {
+        setTimeLeft(Math.ceil((blockEndTime - now) / 1000));
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [blockEndTime]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,11 +163,12 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (blockEndTime !== null) return;
+    
     if (!validate()) return;
 
-    // เริ่มโหลดและล็อคปุ่ม
     setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     const API_URL = import.meta.env.VITE_API_URL || "http://localhost:7777";
 
@@ -110,9 +178,20 @@ const Register = () => {
       );
       const emailCheck = await emailCheckRes.json();
 
+      if (!emailCheckRes.ok) {
+        if (emailCheckRes.status === 429) {
+          const waitTimeSeconds = emailCheck.timeLeft || 180;
+          setBlockEndTime(Date.now() + (waitTimeSeconds * 1000));
+          setTimeLeft(waitTimeSeconds);
+        }
+        setErrors({ ...errors, email: emailCheck.message || 'Something went wrong' });
+        generateCaptcha(); 
+        return;
+      }
+      
       if (emailCheck.exists) {
         setErrors({ ...errors, email: "Email already in use" });
-        generateCaptcha(); // รีเฟรช CAPTCHA เมื่ออีเมลซ้ำ
+        generateCaptcha(); 
         return;
       }
 
@@ -131,11 +210,13 @@ const Register = () => {
       const registerData = await registerRes.json();
 
       if (!registerRes.ok) {
-        setErrors({
-          ...errors,
-          email: registerData.message || "Something went wrong",
-        });
-        generateCaptcha(); // รีเฟรช CAPTCHA เมื่อ Backend ส่ง Error แจ้งเตือนกลับมา
+        if (registerRes.status === 429) {
+          const waitTimeSeconds = registerData.timeLeft || 180;
+          setBlockEndTime(Date.now() + (waitTimeSeconds * 1000));
+          setTimeLeft(waitTimeSeconds);
+        }
+        setErrors({ ...errors, email: registerData.message || 'Something went wrong' });
+        generateCaptcha(); 
         return;
       }
 
@@ -143,9 +224,8 @@ const Register = () => {
     } catch (error) {
       console.error("Registration error:", error);
       setErrors({ ...errors, email: "Failed to connect to the server" });
-      generateCaptcha(); // รีเฟรช CAPTCHA เมื่อเชื่อมต่อเซิร์ฟเวอร์ไม่ได้
+      generateCaptcha(); 
     } finally {
-      // ปลดล็อคปุ่มเสมอ
       setIsLoading(false);
     }
   };
@@ -161,14 +241,15 @@ const Register = () => {
         }}
       />
 
-      {/* ปรับกล่องหลักให้เป็น bg-black/30 backdrop-blur-md และ border-white/20 เพื่อล้อกับหน้า Login */}
-      <div className="scale-80 relative z-10 bg-black/30 backdrop-blur-md w-full max-w-[400px] md:max-w-[1096px] min-h-[500px] md:min-h-[688px] h-auto shadow-2xl flex flex-col md:flex-row overflow-hidden border border-white/20 mx-auto py-10 px-6 md:p-0">
+      {/* ปรับเป็น bg-black/30 backdrop-blur-md ให้ล้อกับหน้า Login */}
+      <div className="scale-[0.8] relative z-10 bg-black/30 backdrop-blur-md w-full max-w-[400px] md:max-w-[1096px] min-h-[500px] md:min-h-[688px] h-auto shadow-2xl flex flex-col md:flex-row overflow-hidden border border-white/20 mx-auto py-10 px-6 md:p-0">
+        
         {/* รูปด้านซ้าย */}
         <div className="hidden md:block w-1/2 p-6">
           <img
             src={imgRegisterDesktop}
-            alt="Taxi"
-            className="w-full h-full object-cover "
+            alt="Register"
+            className="w-full h-full object-cover rounded-xl"
           />
         </div>
 
@@ -179,20 +260,19 @@ const Register = () => {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email Field */}
-            <div className="flex flex-col">
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email address!!"
-                disabled={isLoading}
-                className={`w-full px-6 py-3 md:py-3.5 bg-black/50 placeholder-white/80 text-white outline-none focus:ring-2 text-sm shadow-lg border-2 transition-colors duration-300 ${
-                  errors.email
-                    ? "border-red-500 focus:ring-red-500/50"
-                    : "border-white focus:ring-white"
-                } ${isLoading ? "opacity-50" : ""}`}
-                value={formData.email}
-                onChange={handleChange}
+            
+            {/* Email Field - ใช้ดีไซน์แคปซูลของเพื่อน */}
+            <div className="relative pb-2">
+              <input 
+                type="email" 
+                name="email" 
+                placeholder="Enter your email address!!" 
+                disabled={isLoading || blockEndTime !== null}
+                className={`w-full px-6 py-3 md:py-3.5 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg ${
+                  errors.email ? 'border-red-500' : 'border-white'
+                } ${isLoading || blockEndTime !== null ? 'opacity-50 cursor-not-allowed' : ''}`}
+                value={formData.email} 
+                onChange={handleChange} 
               />
               {errors.email && (
                 <p className="text-red-400 text-[14px] mt-1.5 pl-4 font-bold tracking-wide">
@@ -201,20 +281,18 @@ const Register = () => {
               )}
             </div>
 
-            {/* Password Field */}
-            <div className="flex flex-col">
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter your password"
-                disabled={isLoading}
-                className={`w-full px-6 py-3 md:py-3.5 bg-black/50 placeholder-white/80 text-white outline-none focus:ring-2 text-sm shadow-lg border-2 transition-colors duration-300 ${
-                  errors.password
-                    ? "border-red-500 focus:ring-red-500/50"
-                    : "border-white focus:ring-white"
-                } ${isLoading ? "opacity-50" : ""}`}
-                value={formData.password}
-                onChange={handleChange}
+            {/* Password Field - ใช้ดีไซน์แคปซูลของเพื่อน */}
+            <div className="relative pb-2">
+              <input 
+                type="password" 
+                name="password" 
+                placeholder="Enter your password" 
+                disabled={isLoading || blockEndTime !== null}
+                className={`w-full px-6 py-3 md:py-3.5 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg ${
+                  errors.password ? 'border-red-500' : 'border-white'
+                } ${isLoading || blockEndTime !== null ? 'opacity-50 cursor-not-allowed' : ''}`}
+                value={formData.password} 
+                onChange={handleChange} 
               />
               {errors.password && (
                 <p className="text-red-400 text-[14px] mt-1.5 pl-4 font-bold tracking-wide">
@@ -223,20 +301,18 @@ const Register = () => {
               )}
             </div>
 
-            {/* Confirm Password Field */}
-            <div className="flex flex-col">
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Enter password confirmation"
-                disabled={isLoading}
-                className={`w-full px-6 py-3 md:py-3.5 bg-black/50 placeholder-white/80 text-white outline-none focus:ring-2 text-sm shadow-lg border-2 transition-colors duration-300 ${
-                  errors.confirmPassword
-                    ? "border-red-500 focus:ring-red-500/50"
-                    : "border-white focus:ring-white"
-                } ${isLoading ? "opacity-50" : ""}`}
-                value={formData.confirmPassword}
-                onChange={handleChange}
+            {/* Confirm Password Field - ใช้ดีไซน์แคปซูลของเพื่อน */}
+            <div className="relative pb-2">
+              <input 
+                type="password" 
+                name="confirmPassword" 
+                placeholder="Enter password confirmation" 
+                disabled={isLoading || blockEndTime !== null}
+                className={`w-full px-6 py-3 md:py-3.5 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg ${
+                  errors.confirmPassword ? 'border-red-500' : 'border-white'
+                } ${isLoading || blockEndTime !== null ? 'opacity-50 cursor-not-allowed' : ''}`}
+                value={formData.confirmPassword} 
+                onChange={handleChange} 
               />
               {errors.confirmPassword && (
                 <p className="text-red-400 text-[14px] mt-1.5 pl-4 font-bold tracking-wide">
@@ -248,20 +324,22 @@ const Register = () => {
             {/* Captcha Field */}
             <div className="flex flex-col">
               <div
-                className={`flex items-center justify-center gap-3 bg-black/50 p-2.5 border-2 transition-colors duration-300 ${
+                className={`flex items-center justify-center gap-3 bg-black/50 p-2.5 border-2 transition-colors duration-300 rounded-lg ${
                   errors.userAnswer ? "border-red-500" : "border-white"
                 }`}
               >
-                <span className="bg-[#1e1a3d] px-4 py-1.5 font-bold text-sm text-white">
+                <span className="bg-[#1e1a3d] px-4 py-1.5 font-bold text-sm text-white rounded-md">
                   {captcha.num1} + {captcha.num2} =
                 </span>
                 <input
-                  type="number"
-                  name="userAnswer"
+                  type="number" 
+                  name="userAnswer" 
                   placeholder="?"
-                  disabled={isLoading}
-                  className={`w-16 p-1.5 ] bg-white text-[#1e1a3d] text-center font-bold outline-none ${isLoading ? "opacity-50" : ""}`}
-                  value={captcha.userAnswer}
+                  disabled={isLoading || blockEndTime !== null}
+                  className={`w-16 p-2 rounded-md bg-white text-[#1e1a3d] text-center font-bold outline-none ${
+                    isLoading || blockEndTime !== null ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                  value={captcha.userAnswer} 
                   onChange={handleChange}
                 />
               </div>
@@ -272,14 +350,14 @@ const Register = () => {
               )}
             </div>
 
+            {/* Submit Button - สีกรมท่าของเพื่อน + โลจิกของพี่ตรี */}
             <button
               type="submit"
-              disabled={isLoading}
-              className={`w-full py-5 mt-4 text-black text-xl font-bold shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2 
-                ${
-                  isLoading
-                    ? "bg-[#1e1a3d]/50 cursor-not-allowed"
-                    : "bg-[#ffffff] "
+              disabled={isLoading || blockEndTime !== null}
+              className={`w-full py-5 mt-4 text-white text-xl font-bold rounded-full shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2 
+                ${blockEndTime !== null 
+                  ? 'bg-gray-500/80 cursor-not-allowed opacity-90' 
+                  : 'bg-[#1e1a3d] hover:bg-[#2d2859] hover:brightness-150' 
                 }`}
             >
               {isLoading ? (
@@ -290,24 +368,13 @@ const Register = () => {
                     fill="none"
                     viewBox="0 0 24 24"
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Processing...
                 </>
               ) : (
-                "Create an account"
+                blockEndTime !== null ? `กรุณารอ ${formatTime(timeLeft)}` : 'Create an account'
               )}
             </button>
           </form>
@@ -324,7 +391,7 @@ const Register = () => {
         </div>
       </div>
 
-      {/* เรียกใช้ Global SuccessModal แทน Popup ตัวเดิม */}
+      {/* เรียกใช้ Global SuccessModal */}
       <SuccessModal
         isOpen={isSuccess}
         onClose={() => navigate("/login")}
