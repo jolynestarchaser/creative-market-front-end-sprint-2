@@ -4,6 +4,7 @@ import React from "react";
 // import img2 from "../../assets/images/artist-love-2.png";
 // import img3 from "../../assets/images/artist-love-3.png";
 import Collab from "../../assets/images/collab.jpg";
+import { Link } from "react-router";
 const ArtistLove = () => {
   return (
     <div
@@ -12,9 +13,16 @@ const ArtistLove = () => {
     >
       {/* ส่วนของเนื้อหาข้อความ (ปรับแต่งหรือลบออกได้) */}
       <div className="text-center">
-        <h1 className="text-white text-4xl md:text-6xl font-bold bg-black/40 border-white/40 border-2 px-8 py-4 rounded-xl backdrop-blur-sm">
-          Community for artists
-        </h1>
+        <a
+          href="https://audlist.xyz/club"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block"
+        >
+          <h1 className="text-white text-4xl md:text-6xl font-bold bg-black/40 border-white/40 border-2 px-8 py-4 rounded-xl backdrop-blur-sm hover:bg-black/60 transition-all cursor-pointer">
+            Community for artists
+          </h1>
+        </a>
         <p className="text-white mt-4 text-lg text-center drop md:text-xl">
           Creative Market x Audtlist
         </p>
