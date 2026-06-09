@@ -12,7 +12,7 @@ export default function PaymentGateway({ subtotal, orderId }) {
   return (
     <div className="space-y-6">
       <button
-        className="text-violet-600 text-xs flex items-center gap-1 hover:underline cursor-pointer"
+        className="text-white text-xs flex items-center gap-1 hover:underline cursor-pointer"
         onClick={() => navigate("/market")}
       >
         <ArrowLeft size={16} />
@@ -20,7 +20,7 @@ export default function PaymentGateway({ subtotal, orderId }) {
       </button>
 
       <div>
-        <h1 className="text-2xl font-bold text-violet-600 ">ชำระเงิน</h1>
+        <h1 className="text-2xl font-bold text-white ">ชำระเงิน</h1>
         <p className="text-xs text-white/60 mt-1">
           สแกนชำระเงินอย่างปลอดภัยผ่านระบบพร้อมเพย์ของเรา
         </p>
@@ -34,7 +34,7 @@ export default function PaymentGateway({ subtotal, orderId }) {
 
         <div className="text-center mb-4">
           <p className="text-xs text-white/80">ยอดชำระทั้งหมด</p>
-          <p className="text-3xl font-bold text-violet-600">
+          <p className="text-3xl font-bold text-white">
             ฿ {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </p>
         </div>

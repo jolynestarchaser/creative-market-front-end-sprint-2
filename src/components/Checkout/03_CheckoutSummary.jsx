@@ -113,7 +113,7 @@ export default function CheckoutSummary({
           </div>
         </div>
         <div className="flex justify-between text-sm font-bold mb-5 text-violet-600">
-          <span>ยอดรวมทั้งสิ้น</span>
+          <span className="text-white">ยอดรวมทั้งสิ้น</span>
           <span>฿ {subtotal.toLocaleString()}.-</span>
         </div>
 
@@ -127,7 +127,7 @@ export default function CheckoutSummary({
           </button>
         ) : (
           <div className="bg-purple-50 p-2 rounded text-center">
-            <p className="text-[10px] text-[#4C1D95] font-bold uppercase tracking-widest">
+            <p className="text-[10px] text-violet-600 font-bold uppercase tracking-widest">
               รอการชำระเงิน
             </p>
           </div>

@@ -2,9 +2,9 @@ import React from "react";
 
 export default function CartTable({ cartItems, updateQuantity, removeItem }) {
   return (
-    <div className="mb-8 bg-black/10 p-8 border-1 border-violet-600 rounded-xl">
+    <div className="mb-8 bg-black/10 p-8 border-1 border-white/40 rounded-xl">
       {/* Table Headers */}
-      <div className="grid grid-cols-12 text-sm font-semibold border-b border-violet-300 pb-3 mb-6 text-white">
+      <div className="grid grid-cols-12 text-sm font-semibold border-b border-white/40 pb-3 mb-6 text-white">
         <div className="col-span-6">Product</div>
         <div className="col-span-3 text-center">Quantity</div>
         <div className="col-span-3 text-right">Price</div>
@@ -20,7 +20,7 @@ export default function CartTable({ cartItems, updateQuantity, removeItem }) {
           return (
             <div
               key={itemId || pId}
-              className="grid grid-cols-12 items-center border-b border-violet-300 pb-6"
+              className="grid grid-cols-12 items-center border-b border-white/40 pb-6"
             >
               {/* Product Info */}
               <div className="col-span-6 flex gap-5">

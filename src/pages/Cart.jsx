@@ -47,7 +47,7 @@ export default function Cart() {
 
   if (loadingCart) {
     return (
-      <div className="pt-20 text-center min-h-screen bg-[#161a1c]">
+      <div className="pt-20 text-center min-h-screen bg-[#18181B]">
         <p className="text-white font-bold">กำลังโหลดตะกร้าสินค้า...</p>
       </div>
     );

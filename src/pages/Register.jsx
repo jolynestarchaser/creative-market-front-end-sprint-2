@@ -156,7 +156,7 @@ const Register = () => {
     }
 
     if (parseInt(captcha.userAnswer) !== captcha.num1 + captcha.num2) {
-      newErrors.userAnswer = "Incorrect answer!!";
+      newErrors.userAnswer = "INCORRECT ANSWER";
     }
 
     setErrors(newErrors);
@@ -274,7 +274,7 @@ const Register = () => {
                 name="email"
                 placeholder="Enter your email address"
                 disabled={isLoading || blockEndTime !== null}
-                className={`w-full px-6 py-3 md:py-3.5 bg-black/40 placeholder-white/80 text-cm-text outline-none focus:ring-2 text-sm shadow-lg border-2 transition-colors duration-300 ${
+                className={`w-full px-6 py-3 md:py-3.5 bg-black/60 placeholder-white/80 text-cm-text outline-none focus:ring-1 text-sm shadow-lg border-1 transition-colors duration-300 ${
                   errors.email
                     ? "border-red-500 focus:ring-red-500/50"
                     : "border-white focus:ring-white"
@@ -296,8 +296,10 @@ const Register = () => {
                 name="password"
                 placeholder="Enter your password"
                 disabled={isLoading || blockEndTime !== null}
-                className={`w-full px-6 py-3 md:py-3.5 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg ${
-                  errors.password ? "border-red-500" : "border-white"
+                className={`w-full px-6 py-3 md:py-3.5 bg-black/60 placeholder-white/80 text-cm-text outline-none focus:ring-1 text-sm shadow-lg border-1 transition-colors duration-300 ${
+                  errors.password
+                    ? "border-red-500 focus:ring-red-500/50"
+                    : "border-white focus:ring-white"
                 } ${isLoading || blockEndTime !== null ? "opacity-50 cursor-not-allowed" : ""}`}
                 value={formData.password}
                 onChange={handleChange}
@@ -316,8 +318,10 @@ const Register = () => {
                 name="confirmPassword"
                 placeholder="Enter password confirmation"
                 disabled={isLoading || blockEndTime !== null}
-                className={`w-full px-6 py-3 md:py-3.5 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg ${
-                  errors.confirmPassword ? "border-red-500" : "border-white"
+                className={`w-full px-6 py-3 md:py-3.5 bg-black/60 placeholder-white/80 text-cm-text outline-none focus:ring-1 text-sm shadow-lg border-1 transition-colors duration-300 ${
+                  errors.confirmPassword
+                    ? "border-red-500 focus:ring-red-500/50"
+                    : "border-white focus:ring-white"
                 } ${isLoading || blockEndTime !== null ? "opacity-50 cursor-not-allowed" : ""}`}
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -330,9 +334,9 @@ const Register = () => {
             </div>
 
             {/* Captcha Field */}
-            <div className="flex flex-col">
+            <div className="flex flex-col cont">
               <div
-                className={`flex items-center justify-center gap-3 bg-black/50 p-2.5 border-2 transition-colors duration-300 rounded-lg ${
+                className={`flex items-center justify-center gap-3 bg-black/60 p-2.5 border-1 transition-colors duration-300 ${
                   errors.userAnswer ? "border-red-500" : "border-white"
                 }`}
               >
@@ -364,11 +368,11 @@ const Register = () => {
             <button
               type="submit"
               disabled={isLoading || blockEndTime !== null}
-              className={`w-full py-5 mt-4 text-white text-xl font-bold rounded-full shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2 
+              className={`w-full py-5 mt-4 text-black text-xl font-bold shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2 
                 ${
                   blockEndTime !== null
-                    ? "bg-gray-500/80 cursor-not-allowed opacity-90"
-                    : "bg-[#1e1a3d] hover:bg-[#2d2859] hover:brightness-150"
+                    ? "bg-[#1e1a3d]/50 cursor-not-allowed"
+                    : "bg-[#ffffff] "
                 }`}
             >
               {isLoading ? (
@@ -398,7 +402,7 @@ const Register = () => {
               ) : blockEndTime !== null ? (
                 `กรุณารอ ${formatTime(timeLeft)}`
               ) : (
-                "Create an account"
+                "CREATE AN ACCOUNT"
               )}
             </button>
           </form>
@@ -409,7 +413,7 @@ const Register = () => {
               to="/login"
               className="font-extrabold underline hover:text-white"
             >
-              Login
+              LOGIN
             </Link>
           </p>
         </div>

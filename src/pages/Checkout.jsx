@@ -43,7 +43,7 @@ export default function Checkout() {
     <div className="min-h-screen bg-[#151516]">
       <main className="max-w-5xl w-full mx-auto p-6">
         <button
-          className="text-violet-600 text-xs flex items-center gap-1 hover:underline cursor-pointer mb-6"
+          className="text-white text-xs flex items-center gap-1 hover:underline cursor-pointer mb-6"
           onClick={() => navigate("/cart")}
         >
           <ArrowLeft size={16} />

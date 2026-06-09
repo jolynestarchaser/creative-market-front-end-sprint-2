@@ -21,12 +21,13 @@ const ForgotPassword = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const apiBaseUrl =
+          import.meta.env.VITE_API_URL || "http://localhost:7777";
         const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
           method: "GET",
-          credentials: "include"
+          credentials: "include",
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.user && data.user.role === "user") {
@@ -59,12 +60,15 @@ const ForgotPassword = () => {
   useEffect(() => {
     const checkRateLimitStatus = async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
-        const response = await fetch(`${apiBaseUrl}/api/auth/forgot-password/status`);
+        const apiBaseUrl =
+          import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const response = await fetch(
+          `${apiBaseUrl}/api/auth/forgot-password/status`,
+        );
         const data = await response.json();
 
         if (data.isBlocked) {
-          setBlockEndTime(Date.now() + (data.timeLeft * 1000));
+          setBlockEndTime(Date.now() + data.timeLeft * 1000);
           setTimeLeft(data.timeLeft);
         }
       } catch (error) {
@@ -96,7 +100,7 @@ const ForgotPassword = () => {
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
   const handleRequestToken = async (e) => {
@@ -106,14 +110,15 @@ const ForgotPassword = () => {
     setError("");
 
     if (!email) {
-      setError("Please enter your email address!!");
+      setError("PLEASE ENTER YOUR EMAIL");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+      const apiBaseUrl =
+        import.meta.env.VITE_API_URL || "http://localhost:7777";
       const apiUrl = `${apiBaseUrl}/api/auth/forgot-password`;
 
       const response = await fetch(apiUrl, {
@@ -138,8 +143,8 @@ const ForgotPassword = () => {
           } else if (retryAfterStr) {
             waitTimeSeconds = parseInt(retryAfterStr, 10);
           }
-          
-          setBlockEndTime(Date.now() + (waitTimeSeconds * 1000));
+
+          setBlockEndTime(Date.now() + waitTimeSeconds * 1000);
           setTimeLeft(waitTimeSeconds);
         }
         throw new Error(data.message || "เกิดข้อผิดพลาดในการส่งข้อมูล");
@@ -167,7 +172,7 @@ const ForgotPassword = () => {
         }}
       />
 
-      <div className="scale-[0.8] relative z-10 bg-black/30 backdrop-blur-md w-full max-w-[540px] md:max-w-[648px] h-auto p-8 md:p-10 text-center border border-white/20 shadow-2xl mx-4 flex flex-col justify-center">
+      <div className="scale-80 relative z-10 bg-black/30 backdrop-blur-md w-full max-w-[540px] md:max-w-[648px] h-auto p-8 md:p-10 text-center border border-white/20 shadow-2xl mx-4 flex flex-col justify-center">
         <h2 className="!text-[36px] md:!text-[40px] font-bold text-white mb-6">
           FORGOT PASSWORD
         </h2>
@@ -179,16 +184,20 @@ const ForgotPassword = () => {
 
         {/* --- ส่วนผสม: ดีไซน์ของเพื่อน + โลจิกของพี่ตรี --- */}
         <form onSubmit={handleRequestToken} className="space-y-4 text-left">
-          <label className="block text-white text-lg font-medium mb-1 pl-4 opacity-90 translate-y-7 md:translate-y-3.5">
+          {/* <label className="text-white text-lg font-medium mb-4 pl-4 opacity-90 translate-y-7 md:translate-y-3.5">
             Enter your email
-          </label>
-          <div className={`relative transition-all duration-300 ${error ? "pb-5" : "pb-0"}`}>
+          </label> */}
+          <div
+            className={`relative transition-all duration-300 ${error ? "pb-5" : "pb-0"}`}
+          >
             <input
               type="email"
-              placeholder="name@mail.com"
+              placeholder="name@email.com"
               disabled={isLoading || blockEndTime !== null}
-              className={`w-full px-6 py-3 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg translate-y-8 md:translate-y-5 ${
-                error ? "border-red-500" : "border-white"
+              className={`w-full px-6 py-3 md:py-3.5 bg-black/60 placeholder-white/80 text-white outline-none focus:ring-1 text-sm shadow-lg border-2 transition-colors duration-300 ${
+                error
+                  ? "border-red-500 focus:ring-red-500/50"
+                  : "border-white/20 focus:ring-white"
               } ${isLoading || blockEndTime !== null ? "opacity-50 cursor-not-allowed" : ""}`}
               value={email}
               onChange={(e) => {
@@ -197,7 +206,7 @@ const ForgotPassword = () => {
               }}
             />
             {error && (
-              <p className="absolute left-1/2 -translate-x-1/2 -bottom-1 z-20 px-3 py-0 text-[14px] font-bold text-red-600 bg-white rounded-md border border-red-200 shadow-sm whitespace-nowrap translate-y-15 md:translate-y-7.5">
+              <p className="text-red-400 text-[14px] mt-1.5 pl-4 font-bold tracking-wide">
                 {error}
               </p>
             )}
@@ -206,16 +215,16 @@ const ForgotPassword = () => {
           <button
             type="submit"
             disabled={isLoading || blockEndTime !== null}
-            className={`w-full py-4 mt-6 text-white text-lg font-bold rounded-full shadow-xl transition-all flex items-center justify-center gap-2 translate-y-7.5 md:translate-y-5 ${
-              blockEndTime !== null 
-                ? "bg-gray-500/80 cursor-not-allowed opacity-90" 
-                : "bg-[#1e1a3d] hover:bg-[#2d2859] hover:brightness-150 active:scale-95"
+            className={`w-full py-5 mt-4 text-black text-xl font-bold shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2 ${
+              blockEndTime !== null
+                ? "bg-[#1e1a3d]/50 cursor-not-allowed"
+                : "bg-[#ffffff] "
             }`}
           >
-            {isLoading 
-              ? "กำลังส่งอีเมล..." 
-              : blockEndTime !== null 
-                ? `กรุณารอ ${formatTime(timeLeft)}` 
+            {isLoading
+              ? "กำลังส่งอีเมล..."
+              : blockEndTime !== null
+                ? `กรุณารอ ${formatTime(timeLeft)}`
                 : "Request Reset Link"}
           </button>
         </form>

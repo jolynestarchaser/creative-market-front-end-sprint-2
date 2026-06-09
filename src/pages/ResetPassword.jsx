@@ -27,12 +27,13 @@ const ResetPassword = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const apiBaseUrl =
+          import.meta.env.VITE_API_URL || "http://localhost:7777";
         const response = await fetch(`${apiBaseUrl}/api/auth/me`, {
           method: "GET",
-          credentials: "include"
+          credentials: "include",
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.user && data.user.role === "user") {
@@ -68,12 +69,15 @@ const ResetPassword = () => {
   useEffect(() => {
     const checkRateLimitStatus = async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
-        const response = await fetch(`${apiBaseUrl}/api/auth/reset-password/status`);
+        const apiBaseUrl =
+          import.meta.env.VITE_API_URL || "http://localhost:7777";
+        const response = await fetch(
+          `${apiBaseUrl}/api/auth/reset-password/status`,
+        );
         const data = await response.json();
 
         if (data.isBlocked) {
-          setBlockEndTime(Date.now() + (data.timeLeft * 1000));
+          setBlockEndTime(Date.now() + data.timeLeft * 1000);
           setTimeLeft(data.timeLeft);
         }
       } catch (error) {
@@ -105,7 +109,7 @@ const ResetPassword = () => {
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return `${m}:${s < 10 ? '0' : ''}${s}`;
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
   };
 
   const handleResetPassword = async (e) => {
@@ -117,7 +121,10 @@ const ResetPassword = () => {
 
     // ถ้าไม่มี Token จาก URL (ไม่ได้กดมาจากอีเมล) ให้โชว์ Error
     if (!token) {
-      setErrors({ global: "ไม่พบ Token สำหรับรีเซ็ตรหัสผ่าน กรุณากดลิงก์จากอีเมลใหม่อีกครั้ง" });
+      setErrors({
+        global:
+          "ไม่พบ Token สำหรับรีเซ็ตรหัสผ่าน กรุณากดลิงก์จากอีเมลใหม่อีกครั้ง",
+      });
       return;
     }
 
@@ -134,10 +141,11 @@ const ResetPassword = () => {
 
     setIsLoading(true);
     // Delay 2 วินาที
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:7777";
+      const apiBaseUrl =
+        import.meta.env.VITE_API_URL || "http://localhost:7777";
       const apiUrl = `${apiBaseUrl}/api/auth/reset-password`;
 
       const response = await fetch(apiUrl, {
@@ -156,7 +164,7 @@ const ResetPassword = () => {
       if (!response.ok) {
         if (response.status === 429) {
           const waitTimeSeconds = data.timeLeft || 180;
-          setBlockEndTime(Date.now() + (waitTimeSeconds * 1000));
+          setBlockEndTime(Date.now() + waitTimeSeconds * 1000);
           setTimeLeft(waitTimeSeconds);
         }
         throw new Error(data.message || "เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่าน");
@@ -165,7 +173,11 @@ const ResetPassword = () => {
       setIsSuccess(true);
     } catch (err) {
       console.error("Reset Password Error:", err);
-      setErrors({ global: err.message || 'ลิงก์นี้หมดอายุหรือถูกใช้งานไปแล้ว กรุณาทำรายการขอลืมรหัสผ่านใหม่อีกครั้ง' });
+      setErrors({
+        global:
+          err.message ||
+          "ลิงก์นี้หมดอายุหรือถูกใช้งานไปแล้ว กรุณาทำรายการขอลืมรหัสผ่านใหม่อีกครั้ง",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -195,23 +207,27 @@ const ResetPassword = () => {
           RESET PASSWORD
         </h2>
         <p className="text-white/80 text-sm mb-6 text-center">
-          กรุณากรอกรหัสผ่านใหม่ของคุณเพื่อใช้ในการเข้าสู่ระบบครั้งต่อไป
+          Please enter your new password for your next login.
         </p>
-        
-        <form onSubmit={handleResetPassword} className="space-y-4 text-left relative z-20">
-          
+
+        <form
+          onSubmit={handleResetPassword}
+          className="space-y-4 text-left relative z-20"
+        >
           {/* ป้ายเตือน Global Error */}
           {errors.global && (
             <div className="bg-red-500/20 border border-red-500/50 text-[#ffebed] px-4 py-3 rounded-xl text-[14px] text-center font-medium shadow-sm animate-pulse leading-relaxed mb-4">
               {errors.global}
-              {(errors.global.includes('หมดอายุ') || errors.global.includes('ไม่ถูกต้อง') || errors.global.includes('ไม่พบ Token')) && (
+              {(errors.global.includes("หมดอายุ") ||
+                errors.global.includes("ไม่ถูกต้อง") ||
+                errors.global.includes("ไม่พบ Token")) && (
                 <span className="block mt-2">
-                  กรุณาทำการขอเปลี่ยนรหัสผ่านใหม่{" "}
-                  <Link 
-                    to="/forgot-password" 
+                  Please request a new password.{" "}
+                  <Link
+                    to="/forgot-password"
                     className="inline-block text-[#1e1a3d] bg-white/90 font-bold decoration-2 hover:bg-white hover:scale-105 px-3 py-1 rounded-full shadow-md transition-all duration-300 ml-1"
                   >
-                    ที่นี่ค่ะ
+                    Here
                   </Link>
                 </span>
               )}
@@ -219,17 +235,26 @@ const ResetPassword = () => {
           )}
 
           {/* New Password Input */}
-          <div className={`relative transition-all duration-300 ${errors.newPassword ? 'pb-5' : 'pb-0'}`}>
-            <label className="block text-white text-[15px] font-medium mb-1 pl-4 opacity-90">New Password</label>
-            <input 
-              type="password" 
-              placeholder="กรอกรหัสผ่านใหม่.." 
+          <div
+            className={`relative transition-all duration-300 ${errors.newPassword ? "pb-5" : "pb-0"}`}
+          >
+            <label className="block text-white text-[15px] font-medium mb-1 pl-4 opacity-90">
+              New Password
+            </label>
+            <input
+              type="password"
+              placeholder="Enter new password"
               disabled={isLoading || blockEndTime !== null}
-              className={`w-full px-6 py-3 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg ${errors.newPassword ? 'border-red-500' : 'border-white'} ${isLoading || blockEndTime !== null ? 'opacity-50 cursor-not-allowed' : ''}`}
-              value={newPassword} 
+              className={`w-full px-6 py-3 md:py-3.5 bg-black/30 placeholder-white/80 text-white outline-none focus:ring-1 text-sm shadow-lg border-2 transition-colors duration-300 ${
+                errors.newPassword
+                  ? "border-red-500 focus:ring-red-500/50"
+                  : "border-white/20 focus:ring-white"
+              } ${isLoading || blockEndTime !== null ? "opacity-50 cursor-not-allowed" : ""}`}
+              value={newPassword}
               onChange={(e) => {
                 setNewPassword(e.target.value);
-                if (errors.newPassword) setErrors({ ...errors, newPassword: "" });
+                if (errors.newPassword)
+                  setErrors({ ...errors, newPassword: "" });
               }}
             />
             {errors.newPassword && (
@@ -240,17 +265,26 @@ const ResetPassword = () => {
           </div>
 
           {/* Confirm Password Input */}
-          <div className={`relative transition-all duration-300 ${errors.confirmPassword ? 'pb-5' : 'pb-0'}`}>
-            <label className="block text-white text-[15px] font-medium mb-1 pl-4 opacity-90">Confirm Password</label>
-            <input 
-              type="password" 
-              placeholder="ยืนยันรหัสผ่านใหม่.." 
+          <div
+            className={`relative transition-all duration-300 ${errors.confirmPassword ? "pb-5" : "pb-0"}`}
+          >
+            <label className="block text-white text-[15px] font-medium mb-1 pl-4 opacity-90">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              placeholder="Confirm new password"
               disabled={isLoading || blockEndTime !== null}
-              className={`w-full px-6 py-3 rounded-full bg-[#a9a4e4] placeholder-white/80 text-white border-2 outline-none focus:ring-4 focus:ring-white/50 text-sm shadow-lg ${errors.confirmPassword ? 'border-red-500' : 'border-white'} ${isLoading || blockEndTime !== null ? 'opacity-50 cursor-not-allowed' : ''}`}
-              value={confirmPassword} 
+              className={`w-full px-6 py-3 md:py-3.5 bg-black/30 placeholder-white/80 text-white outline-none focus:ring-1 text-sm shadow-lg border-2 transition-colors duration-300 ${
+                errors.confirmPassword
+                  ? "border-red-500 focus:ring-red-500/50"
+                  : "border-white/20 focus:ring-white"
+              } ${isLoading || blockEndTime !== null ? "opacity-50 cursor-not-allowed" : ""}`}
+              value={confirmPassword}
               onChange={(e) => {
                 setConfirmPassword(e.target.value);
-                if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: "" });
+                if (errors.confirmPassword)
+                  setErrors({ ...errors, confirmPassword: "" });
               }}
             />
             {errors.confirmPassword && (
@@ -260,25 +294,41 @@ const ResetPassword = () => {
             )}
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isLoading || blockEndTime !== null}
-            className={`w-full py-4 mt-6 text-white text-lg font-bold rounded-full shadow-xl transition-all flex justify-center items-center gap-2 ${
-              blockEndTime !== null 
-                ? 'bg-gray-500/80 cursor-not-allowed opacity-90' 
-                : 'bg-[#1e1a3d] hover:bg-[#2d2859] hover:brightness-150 active:scale-95'
+            className={`w-full py-5 mt-4 bg-[#ffffff] text-black text-xl font-bold shadow-xl transition-all active:scale-95 ${
+              blockEndTime !== null
             }`}
           >
             {isLoading ? (
               <>
-                <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Processing...
               </>
+            ) : blockEndTime !== null ? (
+              `Please wait ${formatTime(timeLeft)}`
             ) : (
-              blockEndTime !== null ? `กรุณารอ ${formatTime(timeLeft)}` : 'Reset Password'
+              "Reset Password"
             )}
           </button>
         </form>
@@ -300,7 +350,7 @@ const ResetPassword = () => {
           navigate("/login");
         }}
         title="Reset Successful!"
-        message="รหัสผ่านของคุณถูกเปลี่ยนเรียบร้อยแล้ว"
+        message="Your password has been successfully changed."
         buttonText="LOGIN NOW"
       />
     </div>

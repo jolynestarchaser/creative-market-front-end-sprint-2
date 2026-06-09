@@ -84,7 +84,7 @@ export default function CheckoutForm({
               </button>
               <button
                 onClick={handleDelete}
-                className="text-red-500 text-xs font-bold hover:underline cursor-pointer"
+                className="text-red-600 text-xs font-bold hover:underline cursor-pointer"
               >
                 ลบ
               </button>
@@ -101,7 +101,7 @@ export default function CheckoutForm({
                   type="radio"
                   checked={true}
                   readOnly
-                  className="accent-[#4C1D95]"
+                  className="accent-violet-600"
                 />
               </div>
               <div>
@@ -128,7 +128,7 @@ export default function CheckoutForm({
             </p>
             <button
               onClick={() => setIsEditing(true)}
-              className="rounded-lg bg-[#4C1D95] px-6 py-2.5 text-sm font-bold text-white hover:bg-[#312E81] transition-all cursor-pointer shadow-sm active:scale-95"
+              className="rounded-lg bg-violet-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-violet-300 transition-all cursor-pointer shadow-sm active:scale-95"
             >
               + เพิ่มที่อยู่ใหม่
             </button>
@@ -138,7 +138,7 @@ export default function CheckoutForm({
         {/* 3. โหมดฟอร์ม (Add/Edit Mode) */}
         {isEditing && (
           <div className=" p-6 rounded-lg border border-white/20 space-y-4">
-            <h4 className="text-xs font-bold text-[#ffffff] uppercase tracking-widest mb-2">
+            <h4 className="text-lg font-bold text-[#ffffff] uppercase tracking-widest mb-2">
               {address ? "แก้ไขที่อยู่" : "เพิ่มที่อยู่ใหม่"}
             </h4>
 
@@ -227,7 +227,7 @@ export default function CheckoutForm({
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="flex-grow bg-[#4C1D95] text-white py-2.5 rounded font-bold hover:bg-[#312E81] disabled:opacity-50 transition-all cursor-pointer"
+                className="flex-grow bg-violet-600 text-white py-2.5 rounded font-bold hover:bg-violet-300 disabled:opacity-50 transition-all cursor-pointer"
               >
                 {loading ? "กำลังบันทึก..." : "ยืนยันที่อยู่"}
               </button>
@@ -258,12 +258,12 @@ export default function CheckoutForm({
               <div
                 className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                   paymentMethod === "promptpay"
-                    ? "border-[#4C1D95]"
-                    : "border-gray-300"
+                    ? "border-violet-600"
+                    : "border-violet-300"
                 }`}
               >
                 {paymentMethod === "promptpay" && (
-                  <div className="w-2 h-2 rounded-full bg-[#4C1D95]"></div>
+                  <div className="w-2 h-2 rounded-full bg-violet-600"></div>
                 )}
               </div>
               <div>
